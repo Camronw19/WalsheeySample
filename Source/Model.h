@@ -12,7 +12,6 @@
 
 #include <JuceHeader.h>
 #include "ValueTreeObjectList.h"
-#include "ReaderFactory.h"
 
 namespace IDs
 {
@@ -31,6 +30,61 @@ namespace IDs
 #undef DECLARE_ID
 
 }
+
+template <typename Contents>
+class ReferenceCountingAdapter : public juce::ReferenceCountedObject
+{
+public:
+    template <typename... Args>
+    explicit ReferenceCountingAdapter(Args&&... args)
+        : contents(std::forward<Args>(args)...)
+    {
+    }
+
+    const Contents& get() const
+    {
+        return contents;
+    }
+
+    Contents& get()
+    {
+        return contents;
+    }
+
+private:
+    Contents contents;
+};
+
+template <typename Contents, typename... Args>
+std::unique_ptr<ReferenceCountingAdapter<Contents>>
+make_reference_counted(Args&&... args)
+{
+    auto adapter = new ReferenceCountingAdapter<Contents>(std::forward<Args>(args)...);
+    return std::unique_ptr<ReferenceCountingAdapter<Contents>>(adapter);
+}
+
+template <typename Wrapped>
+struct GenericVariantConverter
+{
+    static Wrapped fromVar(const juce::var& v)
+    {
+        auto cast = dynamic_cast<ReferenceCountingAdapter<Wrapped>*> (v.getObject());
+        jassert(cast != nullptr);
+        return cast->get();
+    }
+
+    static juce::var toVar(Wrapped range)
+    {
+        return { make_reference_counted<Wrapped>(std::move(range)).release() };
+    }
+};
+
+
+template<>
+struct juce::VariantConverter<std::shared_ptr<juce::File>>
+    : GenericVariantConverter<std::shared_ptr<juce::File>>
+{
+};
 
 class SampleModel : public juce::ValueTree::Listener
 {
@@ -61,7 +115,7 @@ public:
 
     void setAudioFile(juce::File& file)
     {
-        audioFile = std::make_shared<juce::File>(file); 
+        audioFile.setValue(std::make_shared<juce::File>(file), nullptr); 
     }
 
     //============ Getter Methods ============
@@ -77,14 +131,10 @@ public:
 
     std::shared_ptr<juce::File> getAudioFile()
     {
-        if (audioFile.get() == nullptr)
-            return nullptr;
-        else
-            return audioFile; 
+        return nullptr; 
     }
 
     //=======================================
-    juce::AudioFormatManager* audioFormatManager; 
     juce::ValueTree state;
 private:
     void valueTreePropertyChanged(juce::ValueTree& treeChanged, const juce::Identifier& property)

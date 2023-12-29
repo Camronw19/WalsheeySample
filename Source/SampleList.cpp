@@ -13,10 +13,10 @@
 //=========================== Sample Button ===========================
 
 SampleButton::SampleButton(juce::ValueTree vt)
-    :sampleModel(vt)
+    :state(vt)
 {
     jassert(vt.hasType(IDs::SAMPLE)); 
-    sampleModel.state.addListener(this);
+    state.addListener(this); 
     updateText(); 
 }
 
@@ -32,13 +32,13 @@ void SampleButton::resized()
 
 void SampleButton::clicked()
 {
-    sampleModel.setName("TEST"); 
+    state.setProperty(IDs::name, "TEST", nullptr); 
 }
 
 
 void SampleButton::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property)
 {
-    if (tree == sampleModel.state)
+    if (tree == state)
     {
         if (property == IDs::name)
         {
@@ -49,7 +49,9 @@ void SampleButton::valueTreePropertyChanged(juce::ValueTree& tree, const juce::I
 
 void SampleButton::updateText()
 {
-    setButtonText(sampleModel.getName()); 
+    juce::String name = state[IDs::name]; 
+    DBG(name);
+    setButtonText(name); 
     repaint(); 
 }
 
