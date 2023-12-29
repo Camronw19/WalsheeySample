@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="GW76bp" name="WalsheeySample" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginWantsMidiIn">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginWantsMidiIn"
+              displaySplashScreen="1">
   <MAINGROUP id="rbvZMw" name="WalsheeySample">
     <GROUP id="{97AC0F2C-2562-36C3-39C9-3456AE2DD379}" name="Source">
       <FILE id="OAhntS" name="ReaderFactory.h" compile="0" resource="0" file="Source/ReaderFactory.h"/>

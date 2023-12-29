@@ -18,6 +18,7 @@
 /*
 */
 class SampleButton : public juce::TextButton, 
+                     public juce::FileDragAndDropTarget,
                      public juce::ValueTree::Listener
 {
 public:
@@ -30,6 +31,9 @@ public:
     void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override; 
 
     void updateText(); 
+
+    bool isInterestedInFileDrag(const juce::StringArray& files) override;
+    void filesDropped(const juce::StringArray& files, int x, int y) override;
 
     juce::ValueTree state; 
 private:

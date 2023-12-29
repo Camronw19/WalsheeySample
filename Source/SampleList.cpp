@@ -91,6 +91,43 @@ bool SampleList::isSuitableType(const juce::ValueTree& sample) const
     return sample.hasType(IDs::SAMPLE); 
 }
 
+bool SampleButton::isInterestedInFileDrag(const juce::StringArray& files)
+{
+    for (auto file : files)
+        if (file.contains(".wav") || file.contains(".mp3") || file.contains(".aif"))
+            return true;
+
+    // If no valid files are found, show an error message
+    juce::AlertWindow::showMessageBoxAsync(
+        juce::AlertWindow::WarningIcon,
+        "Invalid File Format",
+        "Please drag and drop only WAV, MP3, or AIF files.",
+        "OK"
+    );
+
+    return false;
+}
+
+void SampleButton::filesDropped(const juce::StringArray& files, int x, int y)
+{
+    auto localPoint = getLocalPoint(this, juce::Point<int>(x, y));
+
+    for (auto filePath : files)
+    {
+        if (isInterestedInFileDrag(filePath))
+        {
+            // Check if the drop location is within the bounds of the button
+            if (getLocalBounds().contains(localPoint))
+            {
+                const juce::File file(filePath);
+
+                // Update button or perform other actions
+                DBG("File dropped on button: " + state[IDs::name].toString());
+            }
+        }
+    }
+}
+
 SampleButton* SampleList::createNewObject(const juce::ValueTree& vt)
 {
     auto* sampleButton = new SampleButton(vt);
