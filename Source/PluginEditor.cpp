@@ -11,11 +11,16 @@
 
 //==============================================================================
 WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (WalsheeySampleAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), mMainSamplerView(mDataModel)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    
+    mDataModel.addListener(*this); 
+    mDataModel.initializeDefualtModel(8); 
+
+    addAndMakeVisible(mMainSamplerView); 
+
+    setResizable(true, true); 
+    setSize (800, 600);
 }
 
 WalsheeySampleAudioProcessorEditor::~WalsheeySampleAudioProcessorEditor()
@@ -25,16 +30,20 @@ WalsheeySampleAudioProcessorEditor::~WalsheeySampleAudioProcessorEditor()
 //==============================================================================
 void WalsheeySampleAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void WalsheeySampleAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    auto bounds = getLocalBounds(); 
+    mMainSamplerView.setBounds(bounds.reduced(20)); 
+}
+
+
+void WalsheeySampleAudioProcessorEditor::nameChanged(SampleModel& sample)
+{
+    DBG("EDITOR NAME CHAGED METHOD");
+    juce::String message("Sample " + juce::String(sample.getId()) + " name changed to " + sample.getName()); 
+    DBG(message); 
+    //Change name for corresponding sample in the processor
 }

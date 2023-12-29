@@ -10,11 +10,15 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "Identifiers.h"
+#include "MainSamplerView.h"
+
 
 //==============================================================================
 /**
 */
-class WalsheeySampleAudioProcessorEditor  : public juce::AudioProcessorEditor
+class WalsheeySampleAudioProcessorEditor  : public juce::AudioProcessorEditor, 
+                                            public DataModel::Listener
 {
 public:
     WalsheeySampleAudioProcessorEditor (WalsheeySampleAudioProcessor&);
@@ -24,10 +28,15 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void nameChanged(SampleModel& sample) override; 
+
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+    DataModel mDataModel; 
+
+    MainSamplerView mMainSamplerView; 
+
     WalsheeySampleAudioProcessor& audioProcessor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WalsheeySampleAudioProcessorEditor)
 };
+

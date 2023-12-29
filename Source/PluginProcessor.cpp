@@ -22,6 +22,7 @@ WalsheeySampleAudioProcessor::WalsheeySampleAudioProcessor()
                        )
 #endif
 {
+    mSampler.addVoice(new juce::SamplerVoice()); 
 }
 
 WalsheeySampleAudioProcessor::~WalsheeySampleAudioProcessor()
