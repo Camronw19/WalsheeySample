@@ -10,9 +10,7 @@
 
 #pragma once
 
-
 #include <JuceHeader.h>
-
 
 //============================================================================= =
 template<typename ObjectType, typename CriticalSectionType = juce::DummyCriticalSection>

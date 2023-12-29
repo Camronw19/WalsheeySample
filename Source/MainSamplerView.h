@@ -11,7 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Identifiers.h"
+#include "Model.h"
 #include "SampleList.h"
 
 class MainSamplerView : public juce::Component, 

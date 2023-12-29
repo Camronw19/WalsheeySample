@@ -47,3 +47,11 @@ void WalsheeySampleAudioProcessorEditor::nameChanged(SampleModel& sample)
     DBG(message); 
     //Change name for corresponding sample in the processor
 }
+
+void fileChanged(SampleModel& sample)
+{
+    DBG("FILE CHAGED METHOD");
+    juce::String message("Sample " + juce::String(sample.getId()) + " file changed to " + sample.getAudioFile()->getFullPathName());
+    DBG(message);
+    //Change name for corresponding sample in the processor
+}

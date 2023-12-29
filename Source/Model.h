@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "ValueTreeObjectList.h"
+#include "ReaderFactory.h"
 
 namespace IDs
 {
@@ -23,6 +24,7 @@ namespace IDs
     DECLARE_ID(SAMPLE)
     DECLARE_ID(id)
     DECLARE_ID(name)
+    DECLARE_ID(file)
 
     DECLARE_ID(SETTINGS)
 
@@ -30,19 +32,23 @@ namespace IDs
 
 }
 
-//Provides an abstraction for SAMPLE value trees
 class SampleModel : public juce::ValueTree::Listener
 {
 public:
+     explicit SampleModel()
+        :SampleModel(juce::ValueTree(IDs::SAMPLE)) {}
+
     SampleModel(const juce::ValueTree& vt)
         :state(vt),
         name(state, IDs::name, nullptr),
-        id(state, IDs::id, nullptr)
+        id(state, IDs::id, nullptr), 
+        audioFile(state, IDs::file, nullptr)
     {
         jassert(state.hasType(IDs::SAMPLE));
         state.addListener(this);
     }
 
+    //============ Setter Methods ============
     void setName(const juce::String n)
     {
         name.setValue(n, nullptr);
@@ -53,6 +59,12 @@ public:
         id.setValue(i, nullptr);
     }
 
+    void setAudioFile(juce::File& file)
+    {
+        audioFile = std::make_shared<juce::File>(file); 
+    }
+
+    //============ Getter Methods ============
     juce::String getName()
     {
         return name;
@@ -63,23 +75,38 @@ public:
         return id;
     }
 
+    std::shared_ptr<juce::File> getAudioFile()
+    {
+        if (audioFile.get() == nullptr)
+            return nullptr;
+        else
+            return audioFile; 
+    }
+
+    //=======================================
+    juce::AudioFormatManager* audioFormatManager; 
     juce::ValueTree state;
 private:
     void valueTreePropertyChanged(juce::ValueTree& treeChanged, const juce::Identifier& property)
     {
-        if (property == IDs::name)
+        if (treeChanged == state)
         {
-            name.forceUpdateOfCachedValue(); 
-        }
-        else if (property == IDs::id)
-        {
-            id.forceUpdateOfCachedValue(); 
+            if (property == IDs::name)
+                name.forceUpdateOfCachedValue();
+            else if (property == IDs::id)
+            {
+                id.forceUpdateOfCachedValue();
+            }
+            else if (property == IDs::file)
+                audioFile.forceUpdateOfCachedValue();
         }
     }
 
     juce::CachedValue<int> id;
     juce::CachedValue<juce::String> name;
+    juce::CachedValue<std::shared_ptr<juce::File>> audioFile;
 };
+
 
 class DataModel : public juce::ValueTree::Listener
 {
@@ -89,6 +116,7 @@ public:
     public:
         virtual ~Listener() noexcept = default;
         virtual void nameChanged(SampleModel&) {}
+        virtual void fileChanged(SampleModel&) {}
     };
 
     explicit DataModel()
@@ -109,23 +137,30 @@ public:
 
     }
 
+    // Move this method outside of the class? 
     void initializeDefualtModel(int numSamples)
     {
-        jassert(valueTree.hasType(IDs::DATA_MODEL));
+        jassert(state.hasType(IDs::DATA_MODEL));
 
         // Initialize tree with number of samples
         for (int i = 0; i < numSamples; ++i)
         {
-            juce::ValueTree sample(IDs::SAMPLE);
+            SampleModel sampleModel;
+
             const juce::String name("Sample" + juce::String(i + 1));
-            sample.setProperty(IDs::name, name, nullptr);
-            sample.setProperty(IDs::id, i, nullptr);
-            sample.addListener(this);
-            state.addChild(sample, -1, nullptr);
+            sampleModel.setName(name);
+            sampleModel.setId(i);
+
+            sampleModel.state.addListener(this);
+            state.addChild(sampleModel.state, -1, nullptr);
+ 
         }
         this->numSamples = numSamples; 
     }
     
+    
+
+    //============Listener Methods============
     void addListener(Listener& listener)
     {
         listenerList.add(&listener);
@@ -137,6 +172,7 @@ public:
     }
 
     juce::ValueTree state;
+
 private:
     void valueTreePropertyChanged(juce::ValueTree& treeChanged, const juce::Identifier& property) override
     {
@@ -151,12 +187,17 @@ private:
                     {
                         listenerList.call([&](Listener& l) { l.nameChanged(SampleModel(subTree)); });
                     }
+                    else if (property == IDs::file)
+                    {
+                        listenerList.call([&](Listener& l) { l.fileChanged(SampleModel(subTree)); }); 
+                    }
                 }
 
                 return; 
             }
         }
     }
+
 
     int numSamples;
     juce::ListenerList<Listener> listenerList;

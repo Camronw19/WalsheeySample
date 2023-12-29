@@ -12,17 +12,15 @@
 
 
 MainSamplerView::MainSamplerView(const DataModel& dataModel)
-    :mDataModel(dataModel), sampleButtons(dataModel.valueTree)
+    :mDataModel(dataModel), sampleButtons(dataModel.state)
 {
     mDataModel.addListener(*this); 
 
     addAndMakeVisible(sampleButtons); 
 }
 
-
 MainSamplerView::~MainSamplerView()
 {
-
 
 }
 

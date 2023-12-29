@@ -4,7 +4,8 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginWantsMidiIn">
   <MAINGROUP id="rbvZMw" name="WalsheeySample">
     <GROUP id="{97AC0F2C-2562-36C3-39C9-3456AE2DD379}" name="Source">
-      <FILE id="h7j7DZ" name="Identifiers.h" compile="0" resource="0" file="Source/Identifiers.h"/>
+      <FILE id="OAhntS" name="ReaderFactory.h" compile="0" resource="0" file="Source/ReaderFactory.h"/>
+      <FILE id="h7j7DZ" name="Model.h" compile="0" resource="0" file="Source/Model.h"/>
       <FILE id="l6BUUl" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="PGzetR" name="PluginProcessor.h" compile="0" resource="0"
