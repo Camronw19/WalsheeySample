@@ -12,7 +12,7 @@
 
 
 MainSamplerView::MainSamplerView(const DataModel& dataModel)
-    :mDataModel(dataModel), sampleButtons(dataModel.state)
+    :mDataModel(dataModel), sampleButtons(dataModel.getState())
 {
     mDataModel.addListener(*this); 
 

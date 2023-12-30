@@ -19,7 +19,7 @@
 */
 class SampleButton : public juce::TextButton, 
                      public juce::FileDragAndDropTarget,
-                     public juce::ValueTree::Listener
+                     public SampleModel::Listener
 {
 public:
     SampleButton(juce::ValueTree sampleTree);
@@ -28,14 +28,15 @@ public:
     void resized() override;
     void clicked() override; 
 
-    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override; 
-
-    void updateText(); 
-
     bool isInterestedInFileDrag(const juce::StringArray& files) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
-    juce::ValueTree state; 
+    void updateText();
+
+    void nameChanged(juce::String) override; 
+    void fileChanged() override; 
+
+    SampleModel model; 
 private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleButton)

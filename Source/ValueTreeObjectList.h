@@ -144,7 +144,7 @@ protected:
     int indexOf(const juce::ValueTree& v) const noexcept
     {
         for (int i = 0; i < objects.size(); ++i)
-            if (objects.getUnchecked(i)->state == v)
+            if (objects.getUnchecked(i)->model.getState() == v)
                 return i;
 
         return -1;
@@ -158,8 +158,8 @@ protected:
 public:
     int compareElements(ObjectType* first, ObjectType* second) const
     {
-        int index1 = parent.indexOf(first->state);
-        int index2 = parent.indexOf(second->state);
+        int index1 = parent.indexOf(first->model.getState());
+        int index2 = parent.indexOf(second->model.getState());
         return index1 - index2;
     }
 
