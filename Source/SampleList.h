@@ -27,6 +27,7 @@ public:
 
     void resized() override;
     void clicked() override; 
+    void renameButtonToFileName(juce::File);
 
     void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override; 
 
