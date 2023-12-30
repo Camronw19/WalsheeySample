@@ -113,14 +113,30 @@ void SampleList::paint (juce::Graphics& g)
 
 void SampleList::resized()
 {
-    auto bounds = getLocalBounds();
-    auto numSampleButtons = objects.size(); 
-    auto sbHeight = getHeight() / numSampleButtons; 
+    juce::Grid grid;
 
-    for (auto* sb : objects)
-    {
-        sb->setBounds(bounds.removeFromTop(sbHeight));
-    }
+    using Track = juce::Grid::TrackInfo;
+    using Fr = juce::Grid::Fr;
+    using Px = juce::Grid::Px;
+
+    grid.templateRows = { Track(Fr(1)), Track(Fr(1)) };
+    grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(1)), Track(Fr(1)) };
+    grid.items = { juce::GridItem(*objects[0]).withArea(1,1),
+                   juce::GridItem(*objects[1]).withArea(1,2),
+                   juce::GridItem(*objects[2]).withArea(1,3),
+                   juce::GridItem(*objects[3]).withArea(1,4),
+                   juce::GridItem(*objects[4]).withArea(2,1),
+                   juce::GridItem(*objects[5]).withArea(2,2),
+                   juce::GridItem(*objects[6]).withArea(2,3),
+                   juce::GridItem(*objects[7]).withArea(2,4),
+    };
+
+
+    int gapSize = std::min(getWidth() / 25, getHeight() / 25);
+    grid.setGap(juce::Grid::Px(gapSize));
+    grid.performLayout(getLocalBounds().reduced(10));
+
+
 }
 
 bool SampleList::isSuitableType(const juce::ValueTree& sample) const

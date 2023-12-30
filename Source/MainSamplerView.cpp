@@ -32,6 +32,5 @@ void MainSamplerView::paint(juce::Graphics& g)
 
 void MainSamplerView::resized()
 {
-    auto bounds = getLocalBounds(); 
-    sampleButtons.setBounds(bounds); 
+    sampleButtons.setBounds(0,(getHeight() / 2),getWidth(),(getHeight() / 2));
 }
