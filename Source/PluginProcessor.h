@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Command.h"
 
 //==============================================================================
 /**
@@ -56,8 +57,16 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void process(juce::AudioBuffer<float>&, juce::MidiBuffer&);
+
+    void setSample(std::unique_ptr<juce::AudioFormatReader>, int);
+
+
 private:
     juce::Synthesiser mSampler; 
+    CommandFifo<WalsheeySampleAudioProcessor> mCommands; 
+    juce::SpinLock commandQueueMutex;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WalsheeySampleAudioProcessor)
 };
+

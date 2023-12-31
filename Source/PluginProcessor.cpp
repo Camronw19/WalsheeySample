@@ -94,8 +94,7 @@ void WalsheeySampleAudioProcessor::changeProgramName (int index, const juce::Str
 //==============================================================================
 void WalsheeySampleAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    mSampler.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void WalsheeySampleAudioProcessor::releaseResources()
@@ -136,27 +135,10 @@ void WalsheeySampleAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+    process(buffer, midiMessages); 
 }
 
 //==============================================================================
@@ -167,6 +149,7 @@ bool WalsheeySampleAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* WalsheeySampleAudioProcessor::createEditor()
 {
+    juce::SpinLock::ScopedLockType lock(commandQueueMutex);
     return new WalsheeySampleAudioProcessorEditor (*this);
 }
 
@@ -190,3 +173,51 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new WalsheeySampleAudioProcessor();
 }
+
+
+void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatReader> reader, int midiNote)
+{
+    class SetSampleCommand
+    {
+    public:
+        SetSampleCommand(std::unique_ptr<juce::AudioFormatReader> r, int mNote)
+            :reader(std::move(r)), midiNote(mNote)
+        {
+
+        }
+
+        void operator() (WalsheeySampleAudioProcessor& proc)
+        {
+            juce::BigInteger range;
+            range.setRange(midiNote, 1, true);
+            proc.mSampler.addSound(new juce::SamplerSound("Sample", *reader, range, midiNote, 0.1, 0.1, 10.0));
+        }
+
+        std::unique_ptr<juce::AudioFormatReader> reader; 
+        int midiNote; 
+    };
+
+    if (reader == nullptr)
+    {
+        return; 
+    }
+    else 
+    {
+        DBG("YES"); 
+        mCommands.push(SetSampleCommand(std::move(reader), midiNote));
+    }
+}
+
+void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    const juce::GenericScopedTryLock<juce::SpinLock> lock(commandQueueMutex);
+
+    if (lock.isLocked())
+        mCommands.call(*this);
+
+    mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples()); 
+
+    // Update playback positions 
+
+}
+

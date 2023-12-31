@@ -14,6 +14,8 @@ WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (Walsheey
     : AudioProcessorEditor (&p), audioProcessor (p), mMainSamplerView(mDataModel)
 {
     
+    mFormatManager.registerBasicFormats(); 
+
     mDataModel.addListener(*this); 
     mDataModel.initializeDefualtModel(8); 
 
@@ -51,7 +53,12 @@ void WalsheeySampleAudioProcessorEditor::nameChanged(SampleModel& sample)
 void WalsheeySampleAudioProcessorEditor::fileChanged(SampleModel& sample)
 {
     DBG("FILE CHAGED METHOD");
-    juce::String message("Sample " + juce::String(sample.getId()) + " file changed to " );
+    juce::String message("Sample " + juce::String(sample.getId()) + " file changed to ");
     DBG(message);
-    //Change name for corresponding sample in the processor
+    
+    std::shared_ptr<juce::File> sampleFile(sample.getAudioFile());
+    if (sampleFile->exists())
+    {
+        audioProcessor.setSample(std::unique_ptr<juce::AudioFormatReader>(mFormatManager.createReaderFor(*sampleFile)), 36);
+    }
 }

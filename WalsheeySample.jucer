@@ -22,6 +22,7 @@
             file="Source/MainSamplerView.h"/>
       <FILE id="K0fCg7" name="SampleList.cpp" compile="1" resource="0" file="Source/SampleList.cpp"/>
       <FILE id="inxZIr" name="SampleList.h" compile="0" resource="0" file="Source/SampleList.h"/>
+      <FILE id="lfY6YB" name="Command.h" compile="0" resource="0" file="Source/Command.h"/>
       <FILE id="d1B1nd" name="ValueTreeObjectList.h" compile="0" resource="0"
             file="Source/ValueTreeObjectList.h"/>
     </GROUP>

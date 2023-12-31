@@ -158,7 +158,7 @@ public:
 
     std::shared_ptr<juce::File> getAudioFile()
     {
-        return nullptr; 
+        return audioFile; 
     }
 
     //============Listener Methods============

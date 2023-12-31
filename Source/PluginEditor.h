@@ -33,6 +33,7 @@ public:
 
 private:
     DataModel mDataModel; 
+    juce::AudioFormatManager mFormatManager; 
 
     MainSamplerView mMainSamplerView; 
 
