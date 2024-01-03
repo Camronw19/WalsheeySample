@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "Model.h"
 #include "SampleList.h"
+#include "AudioEditor.h"
 
 class MainSamplerView : public juce::Component, 
                         public DataModel::Listener
@@ -28,4 +29,5 @@ private:
     DataModel mDataModel; 
 
     SampleList sampleButtons; 
+    std::shared_ptr<AudioEditor> mAudioEditor = std::make_shared<AudioEditor>();
 };

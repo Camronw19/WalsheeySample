@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "Model.h"
 #include "ValueTreeObjectList.h"
+#include "AudioDisplay.h"
 
 //==============================================================================
 /*
