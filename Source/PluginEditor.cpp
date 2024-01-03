@@ -19,6 +19,8 @@ WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (Walsheey
 
     addAndMakeVisible(mMainSamplerView); 
 
+
+
     setResizable(true, true); 
     setSize (800, 600);
 }
@@ -37,6 +39,9 @@ void WalsheeySampleAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds(); 
     mMainSamplerView.setBounds(bounds.reduced(20)); 
+
+   
+   
 }
 
 

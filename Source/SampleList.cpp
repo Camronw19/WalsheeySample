@@ -32,7 +32,7 @@ void SampleButton::resized()
 
 void SampleButton::clicked()
 {
-    model.setName("TEST");
+  
 }
 
 void SampleButton::nameChanged(juce::String)

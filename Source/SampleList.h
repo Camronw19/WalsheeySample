@@ -13,6 +13,7 @@
 #include <JuceHeader.h>
 #include "Model.h"
 #include "ValueTreeObjectList.h"
+#include "AudioDisplay.h"
 
 //==============================================================================
 /*
@@ -27,7 +28,6 @@ public:
 
     void resized() override;
     void clicked() override; 
-    void renameButtonToFileName(juce::File);
 
     bool isInterestedInFileDrag(const juce::StringArray& files) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
