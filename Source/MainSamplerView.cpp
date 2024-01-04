@@ -12,12 +12,12 @@
 
 
 MainSamplerView::MainSamplerView(const DataModel& dataModel)
-    :mDataModel(dataModel), sampleButtons(dataModel.getState())
+    :mDataModel(dataModel), sampleButtons(dataModel.getState()), mAudioEditor(dataModel)
 {
     mDataModel.addListener(*this); 
 
     addAndMakeVisible(sampleButtons); 
-    addAndMakeVisible(*mAudioEditor);
+    addAndMakeVisible(mAudioEditor);
 }
 
 MainSamplerView::~MainSamplerView()
@@ -34,5 +34,5 @@ void MainSamplerView::paint(juce::Graphics& g)
 void MainSamplerView::resized()
 {
     sampleButtons.setBounds(0,(getHeight() / 2),getWidth(),(getHeight() / 2));
-    mAudioEditor->setBounds(0, 0, getWidth(), (getHeight() / 3));
+    mAudioEditor.setBounds(0, 0, getWidth(), (getHeight() / 3));
 }

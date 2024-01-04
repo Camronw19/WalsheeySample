@@ -216,8 +216,5 @@ void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juc
         mCommands.call(*this);
 
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples()); 
-
-    // Update playback positions 
-
 }
 

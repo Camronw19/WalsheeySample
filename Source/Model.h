@@ -24,6 +24,7 @@ namespace IDs
     DECLARE_ID(id)
     DECLARE_ID(name)
     DECLARE_ID(file)
+    DECLARE_ID(isActive)
 
     DECLARE_ID(SETTINGS)
 
@@ -115,6 +116,7 @@ public:
         virtual ~Listener() noexcept = default;
         virtual void nameChanged(juce::String) {}
         virtual void fileChanged() {}
+        virtual void isActiveChanged(bool) {}
     };
 
      explicit SampleModel()
@@ -122,9 +124,10 @@ public:
 
     SampleModel(const juce::ValueTree& vt)
         :Model(vt),
+        id(getState(), IDs::id, nullptr), 
         name(getState(), IDs::name, nullptr),
-        id(getState(), IDs::id, nullptr),
-        audioFile(getState(), IDs::file, nullptr)
+        audioFile(getState(), IDs::file, nullptr), 
+        isActiveSample(getState(), IDs::isActive, nullptr)
     {
         jassert(getState().hasType(IDs::SAMPLE));
     }
@@ -135,30 +138,40 @@ public:
         name.setValue(n, nullptr);
     }
 
-    void setId(const int i)
-    {
-        id.setValue(i, nullptr);
-    }
-
     void setAudioFile(const juce::File& file)
     {
         audioFile.setValue(std::make_shared<juce::File>(file), nullptr); 
     }
 
+    void setIsActive(const bool active) 
+    {
+        isActiveSample.setValue(active, nullptr);
+    }
+
+    void setId(const int i)
+    {
+        id.setValue(i, nullptr); 
+    }
+
     //============ Getter Methods ============
-    juce::String getName()
+    juce::String getName() const 
     {
         return name;
     }
 
-    int getId()
-    {
-        return id;
-    }
-
-    std::shared_ptr<juce::File> getAudioFile()
+    std::shared_ptr<juce::File> getAudioFile() const
     {
         return audioFile; 
+    }
+
+    bool isActive() const 
+    {
+        return isActiveSample; 
+    }
+
+    int getId() const
+    {
+        return id; 
     }
 
     //============Listener Methods============
@@ -187,10 +200,16 @@ private:
                 audioFile.forceUpdateOfCachedValue();
                 listenerList.call([&](Listener& l) { l.fileChanged(); });
             }
+            else if(property == IDs::isActive)
+            {
+                isActiveSample.forceUpdateOfCachedValue(); 
+                listenerList.call([&](Listener& l) { l.isActiveChanged(isActiveSample); });
+            }
         }
     }
 
-    juce::CachedValue<int> id;
+    juce::CachedValue<int> id; 
+    juce::CachedValue<bool> isActiveSample; 
     juce::CachedValue<juce::String> name;
     juce::CachedValue<std::shared_ptr<juce::File>> audioFile;
 
@@ -207,6 +226,7 @@ public:
         virtual ~Listener() noexcept = default;
         virtual void nameChanged(SampleModel&) {}
         virtual void fileChanged(SampleModel&) {}
+        virtual void activeSampleChanged(SampleModel&) {}
     };
 
     explicit DataModel()
@@ -216,7 +236,7 @@ public:
     }
 
     DataModel(const juce::ValueTree& vt)
-        : Model(vt), numSamples(0)
+        : Model(vt), numSamples(0), activeSample()
     {
        
     }
@@ -248,8 +268,6 @@ public:
         this->numSamples = numSamples; 
     }
     
-    
-
     //============Listener Methods============
     void addListener(Listener& listener)
     {
@@ -264,29 +282,30 @@ public:
 private:
     void valueTreePropertyChanged(juce::ValueTree& treeChanged, const juce::Identifier& property) override
     {
-        
-        for (const auto& subTree : getState())
+        if (treeChanged.hasType(IDs::SAMPLE))
         {
-            if (treeChanged == subTree)
+            if (property == IDs::name)
             {
-                if (treeChanged.hasType(IDs::SAMPLE))
-                {
-                    if (property == IDs::name)
-                    {
-                        listenerList.call([&](Listener& l) { l.nameChanged(SampleModel(subTree)); });
-                    }
-                    else if (property == IDs::file)
-                    {
-                        listenerList.call([&](Listener& l) { l.fileChanged(SampleModel(subTree)); }); 
-                    }
-                }
-
-                return; 
+                listenerList.call([&](Listener& l) { l.nameChanged(SampleModel(treeChanged)); });
+            }
+            else if (property == IDs::file) 
+            {
+                listenerList.call([&](Listener& l) { l.fileChanged(SampleModel(treeChanged)); });
+            }
+            else if (property == IDs::isActive && treeChanged != activeSample && static_cast<bool>((treeChanged[IDs::isActive])) == true)
+            {
+                if (activeSample.isValid())
+                    activeSample.setProperty(IDs::isActive, false, nullptr); 
+                        
+                activeSample = treeChanged;
+                listenerList.call([&](Listener& l) { l.activeSampleChanged(SampleModel(treeChanged)); });
             }
         }
+        return; 
     }
 
     int numSamples;
+    juce::ValueTree activeSample; 
     juce::ListenerList<Listener> listenerList;
 };
 

@@ -12,8 +12,12 @@
 #include "AudioEditor.h"
 
 //==============================================================================
-AudioEditor::AudioEditor()
+AudioEditor::AudioEditor(const DataModel& dm)
+    :dataModel(dm)
 {
+
+    dataModel.addListener(*this); 
+
     addAndMakeVisible(mAudioDisplay);
 
     //Zoom sliders
@@ -124,4 +128,19 @@ void AudioEditor::buttonClicked(juce::Button* button)
 
         mAudioDisplay.setShowChannels(mChan1Toggle.getToggleState(), mChan2Toggle.getToggleState());
     }
+}
+
+void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
+{
+    
+    juce::String name(modelChanged.getName());
+    juce::String id(modelChanged.getId());
+    juce::String message("Active Sample: " + name); 
+    DBG(message); 
+
+    std::shared_ptr<juce::File> file(modelChanged.getAudioFile()); 
+    if (file != nullptr)
+        setThumbnailSource(*file); 
+    else
+        setThumbnailSource(juce::File()); 
 }

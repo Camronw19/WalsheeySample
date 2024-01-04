@@ -32,7 +32,7 @@ void SampleButton::resized()
 
 void SampleButton::clicked()
 {
-  
+    model.setIsActive(true); 
 }
 
 void SampleButton::nameChanged(juce::String)
@@ -44,6 +44,12 @@ void SampleButton::fileChanged()
 {
 
 }
+
+void SampleButton::isActiveChanged(bool isActive)
+{
+
+}
+
 
 void SampleButton::updateText()
 {

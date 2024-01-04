@@ -29,5 +29,5 @@ private:
     DataModel mDataModel; 
 
     SampleList sampleButtons; 
-    std::shared_ptr<AudioEditor> mAudioEditor = std::make_shared<AudioEditor>();
+    AudioEditor mAudioEditor; 
 };

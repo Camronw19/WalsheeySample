@@ -36,6 +36,7 @@ public:
 
     void nameChanged(juce::String) override; 
     void fileChanged() override; 
+    void isActiveChanged(bool) override; 
 
     SampleModel model; 
 private:
