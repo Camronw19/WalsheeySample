@@ -21,6 +21,7 @@ WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (Walsheey
     addAndMakeVisible(mMainSamplerView); 
 
     setResizable(true, true); 
+    setResizeLimits(400, 300, 1200, 900); 
     setSize (800, 600);
 }
 
@@ -41,9 +42,6 @@ void WalsheeySampleAudioProcessorEditor::resized()
 
 void WalsheeySampleAudioProcessorEditor::fileChanged(SampleModel& sample)
 {
-    juce::String message("Sample " + juce::String(sample.getId()) + " file changed to ");
-    DBG(message);
-    
     std::shared_ptr<juce::File> sampleFile(sample.getAudioFile());
 
     if (sampleFile->exists())

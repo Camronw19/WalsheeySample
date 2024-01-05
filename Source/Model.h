@@ -338,18 +338,12 @@ public:
         : DataModel(juce::ValueTree(IDs::DATA_MODEL)) {}
 
     DataModel(const juce::ValueTree& vt)
-        : Model(vt), numSamples(0), activeSample() {}
+        : Model(vt), activeSample() {}
 
     DataModel(const DataModel& other)
         : DataModel(other.getState()) 
     {
-        numSamples = other.numSamples;
         activeSample = other.activeSample; 
-    }
-
-    void setNumSamples(const int nSamples) 
-    {
-        numSamples = nSamples; 
     }
 
     void  initializeDefaultModel(int numSamples)
@@ -369,8 +363,6 @@ public:
             sampleModel.getState().addListener(this);
             getState().addChild(sampleModel.getState(), -1, nullptr);
         }
-
-        setNumSamples(numSamples);
     }
 
     
@@ -410,7 +402,6 @@ private:
         return; 
     }
 
-    int numSamples;
     juce::ValueTree activeSample; 
     juce::ListenerList<Listener> listenerList;
 };

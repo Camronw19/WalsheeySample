@@ -27,8 +27,12 @@ MainSamplerView::~MainSamplerView()
 
 void MainSamplerView::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::grey); 
+
+    g.setColour(juce::Colour::fromRGB(192, 192, 192));
     g.fillAll(); 
+
+    g.setColour(juce::Colour::fromRGB(11, 12, 14));
+    g.drawRect(getLocalBounds().toFloat());
 }
 
 void MainSamplerView::resized()
