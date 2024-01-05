@@ -190,6 +190,7 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
         {
             juce::BigInteger range;
             range.setRange(midiNote, 1, true);
+     
             proc.mSampler.addSound(new juce::SamplerSound("Sample", *reader, range, midiNote, 0.1, 0.1, 10.0));
         }
 
@@ -208,6 +209,29 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
     }
 }
 
+void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr)
+{
+    class SetADSRCommand
+    {
+    public:
+        SetADSRCommand(ADSRParameters adsrParams)
+            :adsr(adsrParams)
+        {
+
+        }
+
+        void operator() (WalsheeySampleAudioProcessor& proc)
+        {
+            auto sound = dynamic_cast<juce::SamplerSound*>(proc.mSampler.getSound(0).get());
+            sound->setEnvelopeParameters(juce::ADSR::Parameters(adsr.attack, adsr.decay, adsr.sustain, adsr.release)); 
+        }
+
+        ADSRParameters adsr; 
+    };
+
+     mCommands.push(SetADSRCommand(adsr));
+}
+
 void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     const juce::GenericScopedTryLock<juce::SpinLock> lock(commandQueueMutex);
@@ -218,3 +242,4 @@ void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juc
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples()); 
 }
 
+    

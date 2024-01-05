@@ -28,7 +28,6 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void nameChanged(SampleModel& sample) override; 
     void fileChanged(SampleModel& sample) override; 
 
 private:
@@ -37,8 +36,9 @@ private:
 
     MainSamplerView mMainSamplerView; 
 
-
     WalsheeySampleAudioProcessor& audioProcessor;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WalsheeySampleAudioProcessorEditor)
 };
+
+
 

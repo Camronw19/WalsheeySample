@@ -25,8 +25,8 @@ namespace IDs
     DECLARE_ID(name)
     DECLARE_ID(file)
     DECLARE_ID(isActive)
-
-    DECLARE_ID(SETTINGS)
+    DECLARE_ID(midiNote)
+    DECLARE_ID(adsr)
 
 #undef DECLARE_ID
 
@@ -80,10 +80,48 @@ struct GenericVariantConverter
     }
 };
 
-
 template<>
 struct juce::VariantConverter<std::shared_ptr<juce::File>>
     : GenericVariantConverter<std::shared_ptr<juce::File>>
+{
+};
+
+struct ADSRParameters
+{
+    ADSRParameters() = default;
+
+    ADSRParameters(float attackTimeSeconds,
+        float decayTimeSeconds,
+        float sustainLevel,
+        float releaseTimeSeconds)
+        : attack(attackTimeSeconds),
+        decay(decayTimeSeconds),
+        sustain(sustainLevel),
+        release(releaseTimeSeconds)
+    {
+    }
+
+    float attack = 0.1f, decay = 0.1f, sustain = 1.0f, release = 0.1f;
+
+    bool operator==(const ADSRParameters& other) const
+    {
+        const float epsilon = 0.001f;
+
+        return (std::abs(attack - other.attack) < epsilon)   &&
+               (std::abs(decay - other.decay) < epsilon)     &&
+               (std::abs(sustain - other.sustain) < epsilon) &&
+               (std::abs(release - other.release) < epsilon);
+    }
+
+    bool operator!=(const ADSRParameters& other) const
+    {
+        return !(*this == other); 
+    }
+};
+
+template<>
+struct juce::VariantConverter<ADSRParameters>
+    : GenericVariantConverter<ADSRParameters>
 {
 };
 
@@ -96,6 +134,8 @@ public:
     {
         state.addListener(this); 
     }
+
+    virtual ~Model() {}
 
     juce::ValueTree getState() const
     {
@@ -117,6 +157,8 @@ public:
         virtual void nameChanged(juce::String) {}
         virtual void fileChanged() {}
         virtual void isActiveChanged(bool) {}
+        virtual void midiNoteChanged(int) {}
+        virtual void adsrChanged(ADSRParameters) {}
     };
 
      explicit SampleModel()
@@ -127,6 +169,8 @@ public:
         id(getState(), IDs::id, nullptr), 
         name(getState(), IDs::name, nullptr),
         audioFile(getState(), IDs::file, nullptr), 
+        midiNote(getState(), IDs::midiNote, nullptr),
+        adsrParameters(getState(), IDs::adsr, nullptr),
         isActiveSample(getState(), IDs::isActive, nullptr)
     {
         jassert(getState().hasType(IDs::SAMPLE));
@@ -153,6 +197,40 @@ public:
         id.setValue(i, nullptr); 
     }
 
+    void setMidiNote(const int m)
+    {
+        int clipped = juce::Range<int>(0, 127).clipValue(m); 
+        midiNote.setValue(clipped, nullptr); 
+    }
+
+    void setAttack(const float attack)
+    {
+        ADSRParameters adsr = adsrParameters.get();
+        adsr.attack = attack; 
+        adsrParameters.setValue(adsr, nullptr); 
+    }
+
+    void setDecay(const float decay)
+    {
+        ADSRParameters adsr = adsrParameters.get();
+        adsr.decay = decay;
+        adsrParameters.setValue(adsr, nullptr);
+    }
+
+    void setSustain(const float sustain)
+    {
+        ADSRParameters adsr = adsrParameters.get();
+        adsr.sustain = sustain;
+        adsrParameters.setValue(adsr, nullptr);
+    }
+
+    void setRelease(const float release)
+    {
+        ADSRParameters adsr = adsrParameters.get();
+        adsr.release = release;
+        adsrParameters.setValue(adsr, nullptr);
+    }
+
     //============ Getter Methods ============
     juce::String getName() const 
     {
@@ -172,6 +250,16 @@ public:
     int getId() const
     {
         return id; 
+    }
+
+    int getMidiNote()
+    {
+        return midiNote; 
+    }
+
+    ADSRParameters getADSR()
+    {
+        return adsrParameters; 
     }
 
     //============Listener Methods============
@@ -194,24 +282,41 @@ private:
             {
                 name.forceUpdateOfCachedValue();
                 listenerList.call([&](Listener& l) { l.nameChanged(name); });
+                return; 
             }
             else if (property == IDs::file)
             {
                 audioFile.forceUpdateOfCachedValue();
                 listenerList.call([&](Listener& l) { l.fileChanged(); });
+                return;
             }
             else if(property == IDs::isActive)
             {
                 isActiveSample.forceUpdateOfCachedValue(); 
                 listenerList.call([&](Listener& l) { l.isActiveChanged(isActiveSample); });
+                return;
+            }
+            else if (property == IDs::midiNote)
+            {
+                midiNote.forceUpdateOfCachedValue(); 
+                listenerList.call([&](Listener& l) { l.midiNoteChanged(midiNote); });
+                return; 
+            }
+            else if (property == IDs::adsr)
+            {
+                adsrParameters.forceUpdateOfCachedValue(); 
+                listenerList.call([&](Listener& l) { l.adsrChanged(adsrParameters); }); 
+                return;
             }
         }
     }
 
     juce::CachedValue<int> id; 
-    juce::CachedValue<bool> isActiveSample; 
     juce::CachedValue<juce::String> name;
     juce::CachedValue<std::shared_ptr<juce::File>> audioFile;
+    juce::CachedValue<int> midiNote; 
+    juce::CachedValue<ADSRParameters> adsrParameters; 
+    juce::CachedValue<bool> isActiveSample; 
 
     juce::ListenerList<Listener> listenerList;
 };
@@ -230,25 +335,24 @@ public:
     };
 
     explicit DataModel()
-        : DataModel(juce::ValueTree(IDs::DATA_MODEL))
-    {
-
-    }
+        : DataModel(juce::ValueTree(IDs::DATA_MODEL)) {}
 
     DataModel(const juce::ValueTree& vt)
-        : Model(vt), numSamples(0), activeSample()
-    {
-       
-    }
+        : Model(vt), numSamples(0), activeSample() {}
 
     DataModel(const DataModel& other)
-        :DataModel(other.getState())
+        : DataModel(other.getState()) 
     {
-
+        numSamples = other.numSamples;
+        activeSample = other.activeSample; 
     }
 
-    // Move this method outside of the class? 
-    void initializeDefualtModel(int numSamples)
+    void setNumSamples(const int nSamples) 
+    {
+        numSamples = nSamples; 
+    }
+
+    void  initializeDefaultModel(int numSamples)
     {
         jassert(getState().hasType(IDs::DATA_MODEL));
 
@@ -260,13 +364,15 @@ public:
             const juce::String name("Sample" + juce::String(i + 1));
             sampleModel.setName(name);
             sampleModel.setId(i);
+            sampleModel.setMidiNote(36 + i);
 
             sampleModel.getState().addListener(this);
             getState().addChild(sampleModel.getState(), -1, nullptr);
- 
         }
-        this->numSamples = numSamples; 
+
+        setNumSamples(numSamples);
     }
+
     
     //============Listener Methods============
     void addListener(Listener& listener)
@@ -310,3 +416,23 @@ private:
 };
 
 
+//void  initializeDefaultModel(DataModel& dataModel, int numSamples)
+//{
+//    jassert(dataModel.getState().hasType(IDs::DATA_MODEL));
+//
+//    // Initialize tree with number of samples
+//    for (int i = 0; i < numSamples; ++i)
+//    {
+//        SampleModel sampleModel;
+//
+//        const juce::String name("Sample" + juce::String(i + 1));
+//        sampleModel.setName(name);
+//        sampleModel.setId(i);
+//        sampleModel.setMidiNote(36 + i);
+//
+//        sampleModel.getState().addListener(&dataModel);
+//        dataModel.getState().addChild(sampleModel.getState(), -1, nullptr);
+//    }
+//
+//    dataModel.setNumSamples(numSamples);
+//}

@@ -132,13 +132,8 @@ void AudioEditor::buttonClicked(juce::Button* button)
 
 void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
 {
-    
-    juce::String name(modelChanged.getName());
-    juce::String id(modelChanged.getId());
-    juce::String message("Active Sample: " + name); 
-    DBG(message); 
-
     std::shared_ptr<juce::File> file(modelChanged.getAudioFile()); 
+
     if (file != nullptr)
         setThumbnailSource(*file); 
     else

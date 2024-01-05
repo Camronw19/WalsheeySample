@@ -13,15 +13,12 @@
 WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (WalsheeySampleAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), mMainSamplerView(mDataModel)
 {
-    
     mFormatManager.registerBasicFormats(); 
 
     mDataModel.addListener(*this); 
-    mDataModel.initializeDefualtModel(8); 
+    mDataModel.initializeDefaultModel(8);
 
     addAndMakeVisible(mMainSamplerView); 
-
-
 
     setResizable(true, true); 
     setSize (800, 600);
@@ -39,31 +36,16 @@ void WalsheeySampleAudioProcessorEditor::paint (juce::Graphics& g)
 
 void WalsheeySampleAudioProcessorEditor::resized()
 {
-    auto bounds = getLocalBounds(); 
-    mMainSamplerView.setBounds(bounds.reduced(20)); 
-
-   
-   
-}
-
-
-void WalsheeySampleAudioProcessorEditor::nameChanged(SampleModel& sample)
-{
-    DBG("EDITOR NAME CHAGED METHOD");
-    juce::String message("Sample " + juce::String(sample.getId()) + " name changed to " + sample.getName()); 
-    DBG(message); 
-    //Change name for corresponding sample in the processor
+    mMainSamplerView.setBounds(getLocalBounds()); 
 }
 
 void WalsheeySampleAudioProcessorEditor::fileChanged(SampleModel& sample)
 {
-    DBG("FILE CHAGED METHOD");
     juce::String message("Sample " + juce::String(sample.getId()) + " file changed to ");
     DBG(message);
     
     std::shared_ptr<juce::File> sampleFile(sample.getAudioFile());
+
     if (sampleFile->exists())
-    {
-        audioProcessor.setSample(std::unique_ptr<juce::AudioFormatReader>(mFormatManager.createReaderFor(*sampleFile)), 36);
-    }
+        audioProcessor.setSample(std::unique_ptr<juce::AudioFormatReader>(mFormatManager.createReaderFor(*sampleFile)), sample.getMidiNote());
 }

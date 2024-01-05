@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "Command.h"
+#include "Model.h"
 
 //==============================================================================
 /**
@@ -60,6 +61,7 @@ public:
     void process(juce::AudioBuffer<float>&, juce::MidiBuffer&);
 
     void setSample(std::unique_ptr<juce::AudioFormatReader>, int);
+    void setADSR(ADSRParameters); 
 
 
 private:

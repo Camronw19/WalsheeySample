@@ -17,8 +17,6 @@
 */
 class AudioDisplay : public juce::Component,
     public juce::ChangeListener
- 
-  
 {
 public:
     AudioDisplay();
