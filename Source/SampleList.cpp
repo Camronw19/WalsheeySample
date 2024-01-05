@@ -25,6 +25,30 @@ SampleButton::~SampleButton()
 
 }
 
+void SampleButton::paint(juce::Graphics& g)
+{
+
+        g.setColour(juce::Colour::fromRGB(11, 12, 14));
+
+    g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
+
+    //Draw outline
+    g.setColour(juce::Colours::grey);
+    g.drawRoundedRectangle(getLocalBounds().toFloat(), 10, 1);
+
+    //Draw key
+    g.setColour(juce::Colours::white);
+
+    if (model.isActive() == true)
+        g.setColour(juce::Colour::fromRGB(0, 102, 204));
+
+    g.setFont(12.0f);
+    g.drawText("Button", getLocalBounds().reduced(10), juce::Justification::topLeft, true);
+
+    //Draw file name
+    g.drawText(model.getName(), getLocalBounds(), juce::Justification::centred, true);
+}
+
 void SampleButton::resized()
 {
 
@@ -35,6 +59,7 @@ void SampleButton::clicked()
     model.setIsActive(true); 
 }
 
+
 void SampleButton::nameChanged(juce::String)
 {
     updateText();
@@ -42,12 +67,12 @@ void SampleButton::nameChanged(juce::String)
 
 void SampleButton::fileChanged()
 {
-
+    repaint();
 }
 
 void SampleButton::isActiveChanged(bool isActive)
 {
-
+    repaint();
 }
 
 
@@ -92,6 +117,7 @@ void SampleButton::filesDropped(const juce::StringArray& files, int x, int y)
                 model.setName(file.getFileNameWithoutExtension());
 
                 // Update button or perform other actions
+                model.setIsActive(true);
                 DBG("File dropped on button: " + model.getName());
             }
         }

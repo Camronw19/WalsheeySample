@@ -22,6 +22,8 @@ ADSRView::ADSRView(const DataModel& dm)
         addAndMakeVisible(slider);
         slider->setSliderStyle(juce::Slider::RotaryVerticalDrag); 
         slider->addListener(this); 
+        slider->setColour(juce::Slider::textBoxTextColourId, juce::Colour::fromRGB(11, 12, 14));
+        slider->setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
     }
 
     attackSlider.setRange(.1, 5, .1); 
@@ -31,6 +33,7 @@ ADSRView::ADSRView(const DataModel& dm)
 
     addAndMakeVisible(activeSampleName); 
     activeSampleName.setJustificationType(juce::Justification::left); 
+    activeSampleName.setColour(juce::Label::textColourId, juce::Colour::fromRGB(11, 12, 14));
 }
 
 ADSRView::~ADSRView()
@@ -39,7 +42,8 @@ ADSRView::~ADSRView()
 
 void ADSRView::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll(juce::Colours::silver);
 }
 
 void ADSRView::resized()

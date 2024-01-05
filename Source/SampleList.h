@@ -26,6 +26,7 @@ public:
     SampleButton(juce::ValueTree sampleTree);
     ~SampleButton() override;
 
+    void paint(juce::Graphics&) override;
     void resized() override;
     void clicked() override; 
 
@@ -38,8 +39,12 @@ public:
     void fileChanged() override; 
     void isActiveChanged(bool) override; 
 
+    
+
     SampleModel model; 
 private:
+
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleButton)
 };
@@ -63,7 +68,11 @@ public:
     void objectRemoved(SampleButton*) override;
     void objectOrderChanged() override;
 
+ 
+
 private:
+
+ 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleList)
 };
 

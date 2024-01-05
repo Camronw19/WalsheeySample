@@ -19,16 +19,21 @@ AudioEditor::AudioEditor(const DataModel& dm)
 
     addAndMakeVisible(mAudioDisplay);
 
+    addAndMakeVisible(mActiveSampleName);
+    mActiveSampleName.setJustificationType(juce::Justification::centred);
+    mActiveSampleName.setColour(juce::Label::textColourId, juce::Colour::fromRGB(11, 12, 14));
+    mActiveSampleName.setColour(juce::Label::outlineColourId, juce::Colour::fromRGB(11, 12, 14));
+
     //Zoom sliders
     mVerticalZoom.addListener(this);
-    mVerticalZoom.setSliderStyle(juce::Slider::Rotary);
+    mVerticalZoom.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mVerticalZoom.setValue(0.0, juce::dontSendNotification);
     mVerticalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     mVerticalZoom.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
     addAndMakeVisible(mVerticalZoom);
 
     mHorizontalZoom.addListener(this);
-    mHorizontalZoom.setSliderStyle(juce::Slider::Rotary);
+    mHorizontalZoom.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mHorizontalZoom.setValue(0., juce::dontSendNotification);
     mHorizontalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     mHorizontalZoom.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
@@ -70,16 +75,19 @@ void AudioEditor::paint(juce::Graphics& g)
 void AudioEditor::resized()
 {
     mAudioDisplay.setBounds(getWaveformWindowBounds());
+
+  
    
     //Slider Layout
     juce::FlexBox sliderFlexBox;
     sliderFlexBox.items.add(juce::FlexItem(mHorizontalScroll).withFlex(1.0, 1.0));
-    sliderFlexBox.items.add (juce::FlexItem(mVerticalZoom).withFlex(1.0,  1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mVerticalZoom).withFlex(1.0,  1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mActiveSampleName).withFlex(1.0, 1.0));
     sliderFlexBox.items.add(juce::FlexItem(mHorizontalZoom).withFlex(1.0, 1.0));
     sliderFlexBox.items.add(juce::FlexItem(mChannelSelect).withFlex(1.0, 1.0));
 
     sliderFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
-    sliderFlexBox.justifyContent = juce::FlexBox::JustifyContent::flexStart;
+    sliderFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
     sliderFlexBox.alignContent = juce::FlexBox::AlignContent::center;
    
     sliderFlexBox.performLayout(getSliderWindowBounds());
@@ -122,11 +130,35 @@ void AudioEditor::buttonClicked(juce::Button* button)
 void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
 {
     std::shared_ptr<juce::File> file(modelChanged.getAudioFile()); 
+    updateWaveform(file);
+    updateNameLabel(modelChanged.getName());
+}
 
-    if (file != nullptr)
-        setThumbnailSource(*file); 
+void AudioEditor::fileChanged(SampleModel& modelChanged)
+{
+    std::shared_ptr<juce::File> file(modelChanged.getAudioFile());
+    updateWaveform(file);
+    updateNameLabel(modelChanged.getName());
+}
+
+void AudioEditor::nameChanged(SampleModel& modelChanged)
+{
+    updateNameLabel(modelChanged.getName());
+}
+
+void AudioEditor::updateWaveform(std::shared_ptr<juce::File> file)
+{
+    if (file != nullptr) {
+        setThumbnailSource(*file);
+    }
     else
-        setThumbnailSource(juce::File()); 
+    {
+        setThumbnailSource(juce::File());
+    }
+}
+void AudioEditor::updateNameLabel(juce::String name)
+{
+    mActiveSampleName.setText(name, juce::dontSendNotification);
 }
 
 void AudioEditor::ChannelMenuChanged()

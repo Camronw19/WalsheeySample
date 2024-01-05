@@ -34,6 +34,10 @@ public:
     void buttonClicked(juce::Button* button) override;
 
     void activeSampleChanged(SampleModel&) override; 
+    void fileChanged(SampleModel&) override;
+    void nameChanged(SampleModel&) override;
+    void updateWaveform(std::shared_ptr<juce::File>);
+    void updateNameLabel(juce::String);
     void ChannelMenuChanged();
 
     juce::Rectangle<int> getWaveformWindowBounds();
@@ -44,7 +48,10 @@ private:
     juce::Slider mHorizontalZoom;
     juce::Slider mHorizontalScroll;
     juce::ComboBox mChannelSelect;
-
+    juce::Label mActiveSampleName;
     DataModel dataModel; 
+
+    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioEditor)
 };
