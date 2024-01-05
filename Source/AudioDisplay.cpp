@@ -13,7 +13,7 @@
 
 //==============================================================================
 AudioDisplay::AudioDisplay()
-    : mThumbnailCache(5), mVerticalZoom(1.0f), mHorisontalZoom(0), mHorisontalScroll(0), mShowChan1(true), mShowChan2(true),
+    : mThumbnailCache(5), mVerticalZoom(1.0f), mHorizontalZoom(0), mHorizontalScroll(0), mShowChan1(true), mShowChan2(true),
     mThumbnail(1024, mFormatManager, mThumbnailCache)
 {
     mFormatManager.registerBasicFormats();
@@ -47,13 +47,13 @@ void AudioDisplay::paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& 
 
 void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(juce::Colour::fromRGB(240, 240, 240));
+    g.setColour(juce::Colour::fromRGB(11, 12, 14));
     g.fillRect(thumbnailBounds);
 
     g.setColour(juce::Colour::fromRGB(0, 102, 204));
 
-    double startTime = mThumbnail.getTotalLength() * mHorisontalScroll;
-    double endTime = startTime + (mThumbnail.getTotalLength() * (1 - mHorisontalZoom));
+    double startTime = mThumbnail.getTotalLength() * mHorizontalScroll;
+    double endTime = startTime + (mThumbnail.getTotalLength() * (1 - mHorizontalZoom));
 
     if (mShowChan1 && !mShowChan2)
     {
@@ -94,15 +94,15 @@ void AudioDisplay::setVerticalZoom(float vZoom)
     repaint();
 }
 
-void AudioDisplay::setHorisontalZoom(float hZoom)
+void AudioDisplay::setHorizontalZoom(float hZoom)
 {
-    mHorisontalZoom = hZoom;
+    mHorizontalZoom = hZoom;
     repaint();
 }
 
-void AudioDisplay::setHorisontalScroll(float hScroll)
+void AudioDisplay::setHorizontalScroll(float hScroll)
 {
-    mHorisontalScroll = hScroll;
+    mHorizontalScroll = hScroll;
     repaint();
 }
 

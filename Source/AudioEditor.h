@@ -34,14 +34,16 @@ public:
     void buttonClicked(juce::Button* button) override;
 
     void activeSampleChanged(SampleModel&) override; 
+    void ChannelMenuChanged();
 
+    juce::Rectangle<int> getWaveformWindowBounds();
+    juce::Rectangle<int> getSliderWindowBounds();
 private:
     AudioDisplay mAudioDisplay;
     juce::Slider mVerticalZoom;
-    juce::Slider mHorisontalZoom;
-    juce::Slider mHorisontalScroll;
-    juce::ToggleButton mChan1Toggle;
-    juce::ToggleButton mChan2Toggle;
+    juce::Slider mHorizontalZoom;
+    juce::Slider mHorizontalScroll;
+    juce::ComboBox mChannelSelect;
 
     DataModel dataModel; 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioEditor)

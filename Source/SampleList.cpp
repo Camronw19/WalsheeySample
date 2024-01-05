@@ -113,7 +113,7 @@ SampleList::~SampleList()
 
 void SampleList::paint (juce::Graphics& g)
 {
-    g.setColour(juce::Colours::burlywood); 
+    g.setColour(juce::Colour::fromRGB(11, 12, 14));
     g.drawRect(getLocalBounds().toFloat()); 
 }
 

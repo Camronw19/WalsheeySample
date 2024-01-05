@@ -15,40 +15,42 @@
 AudioEditor::AudioEditor(const DataModel& dm)
     :dataModel(dm)
 {
-
     dataModel.addListener(*this); 
 
     addAndMakeVisible(mAudioDisplay);
 
     //Zoom sliders
     mVerticalZoom.addListener(this);
-    mVerticalZoom.setSliderStyle(juce::Slider::LinearBarVertical);
+    mVerticalZoom.setSliderStyle(juce::Slider::Rotary);
     mVerticalZoom.setValue(0.0, juce::dontSendNotification);
     mVerticalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    mVerticalZoom.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
     addAndMakeVisible(mVerticalZoom);
 
-    mHorisontalZoom.addListener(this);
-    mHorisontalZoom.setSliderStyle(juce::Slider::LinearBarVertical);
-    mHorisontalZoom.setValue(0., juce::dontSendNotification);
-    mHorisontalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    addAndMakeVisible(mHorisontalZoom);
+    mHorizontalZoom.addListener(this);
+    mHorizontalZoom.setSliderStyle(juce::Slider::Rotary);
+    mHorizontalZoom.setValue(0., juce::dontSendNotification);
+    mHorizontalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    mHorizontalZoom.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
+    addAndMakeVisible(mHorizontalZoom);
 
     //Scroll sliders
-    mHorisontalScroll.addListener(this);
-    mHorisontalScroll.setSliderStyle(juce::Slider::LinearBar);
-    mHorisontalScroll.setValue(0.0, juce::dontSendNotification);
-    mHorisontalScroll.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    addAndMakeVisible(mHorisontalScroll);
+    mHorizontalScroll.addListener(this);
+    mHorizontalScroll.setSliderStyle(juce::Slider::LinearHorizontal);
+    mHorizontalScroll.setValue(0.0, juce::dontSendNotification);
+    mHorizontalScroll.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    mHorizontalScroll.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour::fromRGB(0, 102, 204));
+    mHorizontalScroll.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
+    addAndMakeVisible(mHorizontalScroll);
 
-    //Show channel toggle buttons
-    std::pair<bool, bool> showChannel = mAudioDisplay.getShowChannels();
-    addAndMakeVisible(mChan1Toggle);
-    mChan1Toggle.addListener(this);
-    mChan1Toggle.setToggleState(showChannel.first, juce::NotificationType::dontSendNotification);
-
-    addAndMakeVisible(mChan2Toggle);
-    mChan2Toggle.addListener(this);
-    mChan2Toggle.setToggleState(showChannel.second, juce::NotificationType::dontSendNotification);
+    //ChannelSelect Menu
+    addAndMakeVisible(mChannelSelect);
+    mChannelSelect.addItem("Both", 1);
+    mChannelSelect.addItem("Channel 1", 2);
+    mChannelSelect.addItem("Channel 2", 3);
+   
+    mChannelSelect.onChange = [this] { ChannelMenuChanged(); };
+    mChannelSelect.setSelectedId(1);
 }
 
 AudioEditor::~AudioEditor()
@@ -57,22 +59,30 @@ AudioEditor::~AudioEditor()
 
 void AudioEditor::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::burlywood);
+    g.setColour(juce::Colour::fromRGB(11, 12, 14));
     g.drawRect(getLocalBounds().toFloat());
+  
+    float linePositionY = getLocalBounds().getHeight() * 0.75;
+    g.drawLine(getLocalBounds().getX(), linePositionY, getLocalBounds().getRight(), linePositionY);
 }
 
 
 void AudioEditor::resized()
 {
-    auto bounds = getLocalBounds();
-    mAudioDisplay.setBounds(bounds.reduced(50));
-    mVerticalZoom.setBounds(bounds.removeFromRight(20));
-    mHorisontalZoom.setBounds(bounds.removeFromRight(20));
-    mHorisontalScroll.setBounds(bounds.removeFromBottom(20));
+    mAudioDisplay.setBounds(getWaveformWindowBounds());
+   
+    //Slider Layout
+    juce::FlexBox sliderFlexBox;
+    sliderFlexBox.items.add(juce::FlexItem(mHorizontalScroll).withFlex(1.0, 1.0));
+    sliderFlexBox.items.add (juce::FlexItem(mVerticalZoom).withFlex(1.0,  1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mHorizontalZoom).withFlex(1.0, 1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mChannelSelect).withFlex(1.0, 1.0));
 
-    auto toggleBounds = bounds.removeFromLeft(50);
-    mChan1Toggle.setBounds(toggleBounds.removeFromTop(toggleBounds.getHeight() / 2));
-    mChan2Toggle.setBounds(toggleBounds);
+    sliderFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
+    sliderFlexBox.justifyContent = juce::FlexBox::JustifyContent::flexStart;
+    sliderFlexBox.alignContent = juce::FlexBox::AlignContent::center;
+   
+    sliderFlexBox.performLayout(getSliderWindowBounds());
 }
 
 
@@ -89,50 +99,28 @@ void AudioEditor::sliderValueChanged(juce::Slider* slider)
         float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mVerticalZoom.getMaximum()), static_cast<float>(mVerticalZoom.getMinimum()), 1.0f, 0.1f);
         mAudioDisplay.setVerticalZoom(normalizedSliderValue);
     }
-    else if (slider == &mHorisontalZoom)
+    else if (slider == &mHorizontalZoom)
     {
-        float sliderValue = static_cast<float>(mHorisontalZoom.getValue());
-        float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mHorisontalZoom.getMaximum()), static_cast<float>(mHorisontalZoom.getMinimum()), .97f, 0.0f);
-        mAudioDisplay.setHorisontalZoom(normalizedSliderValue);
+        float sliderValue = static_cast<float>(mHorizontalZoom.getValue());
+        float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mHorizontalZoom.getMaximum()), static_cast<float>(mHorizontalZoom.getMinimum()), .97f, 0.0f);
+        mAudioDisplay.setHorizontalZoom(normalizedSliderValue);
     }
-    else if (slider == &mHorisontalScroll)
+    else if (slider == &mHorizontalScroll)
     {
-        float sliderValue = static_cast<float>(mHorisontalScroll.getValue());
-        float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mHorisontalScroll.getMaximum()), static_cast<float>(mHorisontalScroll.getMinimum()), 1.0f, 0.0f);
-        mAudioDisplay.setHorisontalScroll(normalizedSliderValue);
+        float sliderValue = static_cast<float>(mHorizontalScroll.getValue());
+        float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mHorizontalScroll.getMaximum()), static_cast<float>(mHorizontalScroll.getMinimum()), 1.0f, 0.0f);
+        mAudioDisplay.setHorizontalScroll(normalizedSliderValue);
         DBG(normalizedSliderValue);
     }
 }
 
 void AudioEditor::buttonClicked(juce::Button* button)
 {
-    if (button == &mChan1Toggle || button == &mChan2Toggle)
-    {
-        if (!mChan1Toggle.getToggleState() && !mChan2Toggle.getToggleState())
-        {
-            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                "Alert",
-                "At least one channel must be selected!",
-                "OK");
 
-            if (button == &mChan1Toggle)
-            {
-                mChan1Toggle.setToggleState(true, juce::dontSendNotification);
-            }
-            else if (button == &mChan2Toggle)
-            {
-                mChan2Toggle.setToggleState(true, juce::dontSendNotification);
-
-            }
-        }
-
-        mAudioDisplay.setShowChannels(mChan1Toggle.getToggleState(), mChan2Toggle.getToggleState());
-    }
 }
 
 void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
-{
-    
+{ 
     juce::String name(modelChanged.getName());
     juce::String id(modelChanged.getId());
     juce::String message("Active Sample: " + name); 
@@ -143,4 +131,36 @@ void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
         setThumbnailSource(*file); 
     else
         setThumbnailSource(juce::File()); 
+}
+
+void AudioEditor::ChannelMenuChanged()
+{
+    switch (mChannelSelect.getSelectedId())
+    {
+    case 1:  mAudioDisplay.setShowChannels(true,true);  break;
+
+    case 2:  mAudioDisplay.setShowChannels(true,false); break;
+
+    case 3:  mAudioDisplay.setShowChannels(false,true); break;
+    
+    default: break;
+    }
+}
+
+juce::Rectangle<int> AudioEditor::getWaveformWindowBounds()
+{
+    auto bounds = getLocalBounds();
+    juce::Rectangle<int> waveformBounds(bounds.getTopLeft().getX(), bounds.getTopLeft().getY(), bounds.getWidth(), bounds.getHeight() * .75);
+    waveformBounds = waveformBounds.reduced(10);
+
+    return waveformBounds;
+}
+
+juce::Rectangle<int> AudioEditor::getSliderWindowBounds()
+{
+    auto bounds = getLocalBounds();
+    int sliderWindowHeight = bounds.getHeight() / 4;
+    juce::Rectangle<int> sliderWindowBounds(bounds.getX(), bounds.getBottom() - sliderWindowHeight, bounds.getWidth(), sliderWindowHeight);
+
+    return sliderWindowBounds;
 }

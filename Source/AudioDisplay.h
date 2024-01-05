@@ -33,8 +33,8 @@ public:
     void setThumbnailSource(const juce::File& inputSource);
     void thumbnailChanged();
     void setVerticalZoom(float vZoom);
-    void setHorisontalZoom(float hZoom);
-    void setHorisontalScroll(float hScroll);
+    void setHorizontalZoom(float hZoom);
+    void setHorizontalScroll(float hScroll);
     void setShowChannels(bool chan1, bool chan2);
     std::pair<bool, bool> getShowChannels();
 
@@ -47,8 +47,8 @@ private:
     juce::AudioThumbnail mThumbnail;
 
     double mVerticalZoom;
-    double mHorisontalZoom;
-    double mHorisontalScroll;
+    double mHorizontalZoom;
+    double mHorizontalScroll;
     bool mShowChan1;
     bool mShowChan2;
 
