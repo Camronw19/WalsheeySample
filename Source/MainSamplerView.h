@@ -14,6 +14,7 @@
 #include "Model.h"
 #include "SampleList.h"
 #include "AudioEditor.h"
+#include "ADSRView.h"
 
 class MainSamplerView : public juce::Component, 
                         public DataModel::Listener
@@ -30,4 +31,5 @@ private:
 
     SampleList sampleButtons; 
     AudioEditor mAudioEditor; 
+    ADSRView mADSRView; 
 };
