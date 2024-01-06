@@ -175,13 +175,13 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 
-void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatReader> reader, int midiNote)
+void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatReader> reader, int midiNote, int id)
 {
     class SetSampleCommand
     {
     public:
-        SetSampleCommand(std::unique_ptr<juce::AudioFormatReader> r, int mNote)
-            :reader(std::move(r)), midiNote(mNote)
+        SetSampleCommand(std::unique_ptr<juce::AudioFormatReader> r, int mNote, int identifier)
+            :reader(std::move(r)), midiNote(mNote), id(identifier)
         {
 
         }
@@ -190,46 +190,70 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
         {
             juce::BigInteger range;
             range.setRange(midiNote, 1, true);
-     
-            proc.mSampler.addSound(new juce::SamplerSound("Sample", *reader, range, midiNote, 0.1, 0.1, 10.0));
+
+            for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
+            {
+                juce::SynthesiserSound* sound = proc.mSampler.getSound(i).get();
+                juce::SamplerSound* samplerSound = dynamic_cast<juce::SamplerSound*>(sound);
+
+                if (samplerSound != nullptr)
+                {
+                    if (samplerSound->getName() == juce::String(id))
+                    {
+                        proc.mSampler.removeSound(i);
+                        break;
+                    }
+                }
+            }
+
+            proc.mSampler.addSound(new juce::SamplerSound(juce::String(id), *reader, range, midiNote, .1, .1, 10));
         }
 
         std::unique_ptr<juce::AudioFormatReader> reader; 
         int midiNote; 
+        int id; 
     };
 
     if (reader == nullptr)
-    {
         return; 
-    }
     else 
-    {
-        DBG("YES"); 
-        mCommands.push(SetSampleCommand(std::move(reader), midiNote));
-    }
+        mCommands.push(SetSampleCommand(std::move(reader), midiNote, id));
 }
 
-void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr)
+void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr, int id)
 {
     class SetADSRCommand
     {
     public:
-        SetADSRCommand(ADSRParameters adsrParams)
-            :adsr(adsrParams)
+        SetADSRCommand(ADSRParameters adsrParams, int identifier)
+            :adsr(adsrParams), id(identifier)
         {
 
         }
 
         void operator() (WalsheeySampleAudioProcessor& proc)
         {
-            auto sound = dynamic_cast<juce::SamplerSound*>(proc.mSampler.getSound(0).get());
-            sound->setEnvelopeParameters(juce::ADSR::Parameters(adsr.attack, adsr.decay, adsr.sustain, adsr.release)); 
+            for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
+            {
+                juce::SynthesiserSound* sound = proc.mSampler.getSound(i).get();
+                juce::SamplerSound* samplerSound = dynamic_cast<juce::SamplerSound*>(sound);
+
+                if (samplerSound != nullptr)
+                {
+                    if (samplerSound->getName() == juce::String(id))
+                    {
+                        samplerSound->setEnvelopeParameters(juce::ADSR::Parameters(adsr.attack, adsr.decay, adsr.sustain, adsr.release));
+                        break;
+                    }
+                }
+            }
         }
 
         ADSRParameters adsr; 
+        int id; 
     };
 
-     mCommands.push(SetADSRCommand(adsr));
+     mCommands.push(SetADSRCommand(adsr, id));
 }
 
 void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)

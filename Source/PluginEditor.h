@@ -18,7 +18,9 @@
 /**
 */
 class WalsheeySampleAudioProcessorEditor  : public juce::AudioProcessorEditor, 
-                                            public DataModel::Listener
+                                            public DataModel::Listener,
+                                            public SampleModel::Listener
+                                                                        
 {
 public:
     WalsheeySampleAudioProcessorEditor (WalsheeySampleAudioProcessor&);
@@ -29,9 +31,12 @@ public:
     void resized() override;
 
     void fileChanged(SampleModel& sample) override; 
+    void activeSampleChanged(SampleModel&) override;
+    virtual void adsrChanged(ADSRParameters) override; 
 
 private:
-    DataModel mDataModel; 
+    DataModel mDataModel;
+    std::unique_ptr<SampleModel> mActiveSample; 
     juce::AudioFormatManager mFormatManager; 
 
     MainSamplerView mMainSamplerView; 

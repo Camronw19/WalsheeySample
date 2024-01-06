@@ -26,10 +26,7 @@ namespace IDs
     DECLARE_ID(file)
     DECLARE_ID(isActive)
     DECLARE_ID(midiNote)
-    DECLARE_ID(attack)
-    DECLARE_ID(decay)
-    DECLARE_ID(sustain)
-    DECLARE_ID(release)
+    DECLARE_ID(adsr)
 
 #undef DECLARE_ID
 
@@ -122,6 +119,12 @@ struct ADSRParameters
     }
 };
 
+template<>
+struct juce::VariantConverter<ADSRParameters>
+    : GenericVariantConverter<ADSRParameters>
+{
+};
+
 
 class Model : public juce::ValueTree::Listener
 {
@@ -155,10 +158,7 @@ public:
         virtual void fileChanged() {}
         virtual void isActiveChanged(bool) {}
         virtual void midiNoteChanged(int) {}
-        virtual void attackChanged(float) {}
-        virtual void decayChanged(float) {}
-        virtual void sustainChanged(float) {}
-        virtual void releaseChanged(float) {}
+        virtual void adsrChanged(ADSRParameters) {}
     };
 
      explicit SampleModel()
@@ -170,11 +170,8 @@ public:
         name(getState(), IDs::name, nullptr),
         audioFile(getState(), IDs::file, nullptr), 
         midiNote(getState(), IDs::midiNote, nullptr),
-        attack(getState(), IDs::attack, nullptr),
-        decay(getState(), IDs::decay, nullptr),
-        sustain(getState(), IDs::sustain, nullptr),
-        release(getState(), IDs::release, nullptr),
-        isActiveSample(getState(), IDs::isActive, nullptr)
+        adsr(getState(), IDs::adsr, nullptr),
+        isActiveSample(getState(), IDs::isActive, nullptr) 
     {
         jassert(getState().hasType(IDs::SAMPLE));
     }
@@ -211,23 +208,30 @@ public:
 
     void setAttack(const float a)
     {
-        DBG("SETTING ATTACK VT"); 
-        attack.setValue(a, nullptr); 
+        ADSRParameters params = getADSR(); 
+        params.attack = a; 
+        adsr.setValue(params, nullptr); 
     }
 
     void setDecay(const float d)
     {
-        decay.setValue(d, nullptr); 
+        ADSRParameters params = getADSR();
+        params.decay = d;
+        adsr.setValue(params, nullptr);
     }
 
     void setSustain(const float s)
     {
-        sustain.setValue(s, nullptr); 
+        ADSRParameters params = getADSR();
+        params.sustain = s;
+        adsr.setValue(params, nullptr);
     }
 
     void setRelease(const float r)
     {
-        release.setValue(r, nullptr); 
+        ADSRParameters params = getADSR();
+        params.release = r;
+        adsr.setValue(params, nullptr);
     }
 
     //============ Getter Methods ============
@@ -251,14 +255,14 @@ public:
         return id; 
     }
 
-    int getMidiNote()
+    int getMidiNote() const 
     {
         return midiNote; 
     }
 
-    ADSRParameters getADSR()
+    ADSRParameters getADSR() const
     {
-        return ADSRParameters(attack, decay, sustain, release); 
+        return adsr; 
     }
 
     //============Listener Methods============
@@ -301,29 +305,10 @@ private:
                 listenerList.call([&](Listener& l) { l.midiNoteChanged(midiNote); });
                 return; 
             }
-            else if (property == IDs::attack)
+            else if (property == IDs::adsr)
             {
-                attack.forceUpdateOfCachedValue(); 
-                listenerList.call([&](Listener& l) { l.attackChanged(attack); }); 
-                return;
-            }
-            else if (property == IDs::decay)
-            {
-                decay.forceUpdateOfCachedValue();
-                listenerList.call([&](Listener& l) { l.decayChanged(attack); });
-                return;
-            }
-            else if (property == IDs::sustain)
-            {
-                sustain.forceUpdateOfCachedValue();
-                listenerList.call([&](Listener& l) { l.sustainChanged(attack); });
-                return;
-            }
-            else if (property == IDs::release)
-            {
-                release.forceUpdateOfCachedValue();
-                listenerList.call([&](Listener& l) { l.releaseChanged(attack); });
-                return;
+                adsr.forceUpdateOfCachedValue(); 
+                listenerList.call([&](Listener& l) { l.adsrChanged(adsr); });
             }
         }
     }
@@ -332,10 +317,7 @@ private:
     juce::CachedValue<juce::String> name;
     juce::CachedValue<std::shared_ptr<juce::File>> audioFile;
     juce::CachedValue<int> midiNote; 
-    juce::CachedValue<float> attack;
-    juce::CachedValue<float> decay;
-    juce::CachedValue<float> sustain;
-    juce::CachedValue<float> release;
+    juce::CachedValue<ADSRParameters> adsr; 
     juce::CachedValue<bool> isActiveSample; 
 
     juce::ListenerList<Listener> listenerList;
@@ -418,6 +400,7 @@ private:
                 activeSample = treeChanged;
                 listenerList.call([&](Listener& l) { l.activeSampleChanged(SampleModel(treeChanged)); });
             }
+            
         }
         return; 
     }

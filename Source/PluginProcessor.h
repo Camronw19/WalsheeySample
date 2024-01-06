@@ -15,6 +15,15 @@
 //==============================================================================
 /**
 */
+
+class DummySound : public juce::SynthesiserSound
+{
+public:
+    bool appliesToNote(int) override { return false; }
+    bool appliesToChannel(int) override { return false; }
+};
+
+
 class WalsheeySampleAudioProcessor  : public juce::AudioProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
@@ -60,8 +69,8 @@ public:
 
     void process(juce::AudioBuffer<float>&, juce::MidiBuffer&);
 
-    void setSample(std::unique_ptr<juce::AudioFormatReader>, int);
-    void setADSR(ADSRParameters); 
+    void setSample(std::unique_ptr<juce::AudioFormatReader>, int, int);
+    void setADSR(ADSRParameters, int); 
 
 
 private:

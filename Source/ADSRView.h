@@ -34,11 +34,12 @@ public:
 
     void nameChanged(juce::String) override; 
 
-    std::vector<juce::Slider*> getSliders(); 
+    std::vector<juce::Slider*> getSliders();
+    std::vector<juce::Label*> getLabels();
 
 private:
     juce::Slider attackSlider, decaySlider, sustainSlider, releaseSlider; 
-    juce::Label activeSampleName; 
+    juce::Label sampleLabel, attackLabel, decayLabel, sustainLabel, releaseLabel; 
     
     DataModel dataModel;
     std::unique_ptr<SampleModel> activeSample; 
