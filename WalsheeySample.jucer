@@ -30,6 +30,7 @@
       <FILE id="vnuReK" name="AudioEditor.h" compile="0" resource="0" file="Source/AudioEditor.h"/>
       <FILE id="EX3Omr" name="ADSRView.cpp" compile="1" resource="0" file="Source/ADSRView.cpp"/>
       <FILE id="TD84eJ" name="ADSRView.h" compile="0" resource="0" file="Source/ADSRView.h"/>
+      <FILE id="JkvVUL" name="UIConfig.h" compile="0" resource="0" file="Source/UIConfig.h"/>
       <FILE id="d1B1nd" name="ValueTreeObjectList.h" compile="0" resource="0"
             file="Source/ValueTreeObjectList.h"/>
     </GROUP>
