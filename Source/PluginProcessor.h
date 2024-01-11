@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "Command.h"
 #include "Model.h"
+#include "Sampler.h"
 
 //==============================================================================
 /**
@@ -72,11 +73,14 @@ public:
     void setSample(std::unique_ptr<juce::AudioFormatReader>, int, int);
     void setADSR(ADSRParameters, int); 
 
+    float getPlaybackPosition() { return playbackPosition.get(); }
 
 private:
     juce::Synthesiser mSampler; 
     CommandFifo<WalsheeySampleAudioProcessor> mCommands; 
     juce::SpinLock commandQueueMutex;
+
+    juce::Atomic<float> playbackPosition; 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WalsheeySampleAudioProcessor)
 };

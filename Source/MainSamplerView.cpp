@@ -11,8 +11,8 @@
 #include "MainSamplerView.h"
 
 
-MainSamplerView::MainSamplerView(const DataModel& dataModel)
-    :mDataModel(dataModel), sampleButtons(dataModel.getState()), mAudioEditor(dataModel), mADSRView(dataModel)
+MainSamplerView::MainSamplerView(const DataModel& dataModel, PlaybackPositionOverlay::Providor providor)
+    :mDataModel(dataModel), sampleButtons(dataModel.getState()), mAudioEditor(dataModel, std::move(providor)), mADSRView(dataModel)
 {
     mDataModel.addListener(*this); 
 

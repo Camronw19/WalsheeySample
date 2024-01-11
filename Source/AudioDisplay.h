@@ -15,8 +15,34 @@
 //==============================================================================
 /*
 */
+
+class PlaybackPositionOverlay : public juce::Component, 
+                                private DataModel::Listener,
+                                private SampleModel::Listener, 
+                                private juce::Timer
+                                
+{
+public: 
+    using Providor = std::function<float()>; 
+    PlaybackPositionOverlay(const DataModel&, Providor); 
+
+    void paint(juce::Graphics&) override; 
+    void timerCallback() override; 
+
+    void activeSampleChanged(SampleModel&) override;
+
+    double timeToXPosition(); 
+
+private: 
+    Providor providor; 
+    DataModel dataModel;
+    std::unique_ptr<SampleModel> activeSample;
+};
+
+
+
 class AudioDisplay : public juce::Component,
-    public juce::ChangeListener
+                     public juce::ChangeListener
 {
 public:
     AudioDisplay();
@@ -36,9 +62,6 @@ public:
     void setShowChannels(bool chan1, bool chan2);
     std::pair<bool, bool> getShowChannels();
 
-    
-
-    
 private:
     juce::AudioFormatManager mFormatManager;
     juce::AudioThumbnailCache mThumbnailCache;

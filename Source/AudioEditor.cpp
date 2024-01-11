@@ -12,12 +12,13 @@
 #include "AudioEditor.h"
 
 //==============================================================================
-AudioEditor::AudioEditor(const DataModel& dm)
-    :dataModel(dm)
+AudioEditor::AudioEditor(const DataModel& dm, PlaybackPositionOverlay::Providor providor)
+    :dataModel(dm), mPlaybackOverlay(dm, std::move(providor))
 {
     dataModel.addListener(*this); 
 
     addAndMakeVisible(mAudioDisplay);
+    addAndMakeVisible(mPlaybackOverlay); 
 
     addAndMakeVisible(mActiveSampleName);
     mActiveSampleName.setJustificationType(juce::Justification::centred);
@@ -74,10 +75,10 @@ void AudioEditor::paint(juce::Graphics& g)
 
 void AudioEditor::resized()
 {
-    mAudioDisplay.setBounds(getWaveformWindowBounds());
+    auto audioDisplayBounds = getWaveformWindowBounds(); 
+    mAudioDisplay.setBounds(audioDisplayBounds);
+    mPlaybackOverlay.setBounds(audioDisplayBounds); 
 
-  
-   
     //Slider Layout
     juce::FlexBox sliderFlexBox;
     sliderFlexBox.items.add(juce::FlexItem(mHorizontalScroll).withFlex(1.0, 1.0));
@@ -129,15 +130,13 @@ void AudioEditor::buttonClicked(juce::Button* button)
 
 void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
 {
-    std::shared_ptr<juce::File> file(modelChanged.getAudioFile()); 
-    updateWaveform(file);
+    updateWaveform(modelChanged);
     updateNameLabel(modelChanged.getName());
 }
 
 void AudioEditor::fileChanged(SampleModel& modelChanged)
 {
-    std::shared_ptr<juce::File> file(modelChanged.getAudioFile());
-    updateWaveform(file);
+    updateWaveform(modelChanged); 
     updateNameLabel(modelChanged.getName());
 }
 
@@ -146,16 +145,15 @@ void AudioEditor::nameChanged(SampleModel& modelChanged)
     updateNameLabel(modelChanged.getName());
 }
 
-void AudioEditor::updateWaveform(std::shared_ptr<juce::File> file)
+void AudioEditor::updateWaveform(SampleModel& modelChanged)
 {
-    if (file != nullptr) {
+    auto file = modelChanged.getAudioFile();
+    if (file != nullptr)
         setThumbnailSource(*file);
-    }
     else
-    {
-        setThumbnailSource(juce::File());
-    }
+        setThumbnailSource(juce::File()); 
 }
+
 void AudioEditor::updateNameLabel(juce::String name)
 {
     mActiveSampleName.setText(name, juce::dontSendNotification);

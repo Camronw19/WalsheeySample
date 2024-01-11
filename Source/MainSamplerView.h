@@ -15,12 +15,13 @@
 #include "SampleList.h"
 #include "AudioEditor.h"
 #include "ADSRView.h"
+#include "AudioDisplay.h"
 
 class MainSamplerView : public juce::Component, 
                         public DataModel::Listener
 {
 public:
-    MainSamplerView(const DataModel& dataModel); 
+    MainSamplerView(const DataModel& dataModel, PlaybackPositionOverlay::Providor); 
     ~MainSamplerView() override; 
 
     void paint(juce::Graphics&) override;

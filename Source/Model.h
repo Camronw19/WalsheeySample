@@ -27,6 +27,8 @@ namespace IDs
     DECLARE_ID(isActive)
     DECLARE_ID(midiNote)
     DECLARE_ID(adsr)
+    DECLARE_ID(totalRange)
+    DECLARE_ID(visibleRange)
 
 #undef DECLARE_ID
 
@@ -83,6 +85,12 @@ struct GenericVariantConverter
 template<>
 struct juce::VariantConverter<std::shared_ptr<juce::File>>
     : GenericVariantConverter<std::shared_ptr<juce::File>>
+{
+};
+
+template<>
+struct juce::VariantConverter<juce::Range<double>>
+    : GenericVariantConverter<juce::Range<double>>
 {
 };
 
@@ -159,6 +167,7 @@ public:
         virtual void isActiveChanged(bool) {}
         virtual void midiNoteChanged(int) {}
         virtual void adsrChanged(ADSRParameters) {}
+        virtual void visibleRangeChanged(juce::Range<double>) {}
     };
 
      explicit SampleModel()
@@ -171,9 +180,12 @@ public:
         audioFile(getState(), IDs::file, nullptr), 
         midiNote(getState(), IDs::midiNote, nullptr),
         adsr(getState(), IDs::adsr, nullptr),
-        isActiveSample(getState(), IDs::isActive, nullptr) 
+        isActiveSample(getState(), IDs::isActive, nullptr),
+        totalRange(getState(), IDs::totalRange, nullptr), 
+        visibleRange(getState(), IDs::visibleRange, nullptr)
     {
         jassert(getState().hasType(IDs::SAMPLE));
+        formatManager.registerBasicFormats(); 
     }
 
     SampleModel(const SampleModel& other)
@@ -188,6 +200,10 @@ public:
     void setAudioFile(const juce::File& file)
     {
         audioFile.setValue(std::make_shared<juce::File>(file), nullptr); 
+        std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(file)); 
+        
+        setTotalRange(juce::Range<double>(0, static_cast<double>(reader->lengthInSamples / reader->sampleRate)));
+        setVisibleRange(juce::Range<double>(0, static_cast<double>(reader->lengthInSamples / reader->sampleRate)));
     }
 
     void setIsActive(const bool active) 
@@ -234,6 +250,16 @@ public:
         adsr.setValue(params, nullptr);
     }
 
+    void setTotalRange(const juce::Range<double> range)
+    {
+        totalRange.setValue(range, nullptr); 
+    }
+
+    void setVisibleRange(const juce::Range<double> range)
+    {
+        visibleRange.setValue(totalRange.get().constrainRange(range), nullptr); 
+    }
+
     //============ Getter Methods ============
     juce::String getName() const 
     {
@@ -263,6 +289,16 @@ public:
     ADSRParameters getADSR() const
     {
         return adsr; 
+    }
+
+    juce::Range<double> getTotalRange()
+    {
+        return totalRange; 
+    }
+
+    juce::Range<double> getVisibleRange()
+    {
+        return visibleRange; 
     }
 
     //============Listener Methods============
@@ -310,6 +346,11 @@ private:
                 adsr.forceUpdateOfCachedValue(); 
                 listenerList.call([&](Listener& l) { l.adsrChanged(adsr); });
             }
+            else if (property == IDs::visibleRange)
+            {
+                visibleRange.forceUpdateOfCachedValue(); 
+                listenerList.call([&](Listener& l) { l.visibleRangeChanged(visibleRange); });
+            }
         }
     }
 
@@ -319,8 +360,11 @@ private:
     juce::CachedValue<int> midiNote; 
     juce::CachedValue<ADSRParameters> adsr; 
     juce::CachedValue<bool> isActiveSample; 
+    juce::CachedValue<juce::Range<double>> totalRange;
+    juce::CachedValue<juce::Range<double>> visibleRange;
 
     juce::ListenerList<Listener> listenerList;
+    juce::AudioFormatManager formatManager; 
 };
 
 
@@ -361,6 +405,8 @@ public:
             sampleModel.setName(name);
             sampleModel.setId(i);
             sampleModel.setMidiNote(36 + i);
+            sampleModel.setTotalRange(juce::Range<double>(0, 0));
+            sampleModel.setVisibleRange(juce::Range<double>(0, 0));
 
             sampleModel.getState().addListener(this);
             getState().addChild(sampleModel.getState(), -1, nullptr);

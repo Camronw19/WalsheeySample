@@ -11,7 +11,7 @@
 
 //==============================================================================
 WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (WalsheeySampleAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), mMainSamplerView(mDataModel)
+    : AudioProcessorEditor(&p), audioProcessor(p), mMainSamplerView(mDataModel, [&p] { return p.getPlaybackPosition(); })
 {
     mFormatManager.registerBasicFormats(); 
 

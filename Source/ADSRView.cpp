@@ -22,10 +22,10 @@ ADSRView::ADSRView(const DataModel& dm)
     {
         slider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0); 
         slider->setSliderStyle(juce::Slider::RotaryVerticalDrag); 
-        addAndMakeVisible(slider); 
-        slider->addListener(this); 
         slider->setColour(juce::Slider::textBoxTextColourId, juce::Colour::fromRGB(11, 12, 14));
         slider->setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
+        slider->addListener(this); 
+        addAndMakeVisible(slider); 
     }
 
     attackSlider.setRange(.1, 5, .1); 
@@ -33,22 +33,19 @@ ADSRView::ADSRView(const DataModel& dm)
     sustainSlider.setRange(.1, 5, .1);
     releaseSlider.setRange(0, 1, .1);
 
+    //Initialize labels
     for (auto& label : getLabels())
     {
-        addAndMakeVisible(label); 
         label->setJustificationType(juce::Justification::centred);
         label->setColour(juce::Label::textColourId, juce::Colour::fromRGB(11, 12, 14));
+        addAndMakeVisible(label); 
     }
 
     sampleLabel.setJustificationType(juce::Justification::left); 
-
     attackLabel.setText("Attack", juce::dontSendNotification);
     decayLabel.setText("Decay", juce::dontSendNotification);
     sustainLabel.setText("Sustain", juce::dontSendNotification);
-    releaseLabel.setText("Release", juce::dontSendNotification);
-
-
-    
+    releaseLabel.setText("Release", juce::dontSendNotification); 
 }
 
 ADSRView::~ADSRView()
@@ -57,7 +54,6 @@ ADSRView::~ADSRView()
 
 void ADSRView::paint (juce::Graphics& g)
 {
-    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
     g.fillAll(juce::Colours::silver);
 }
 

@@ -23,7 +23,7 @@ class AudioEditor : public juce::Component,
     public DataModel::Listener
 {
 public:
-    AudioEditor(const DataModel&);
+    AudioEditor(const DataModel&, PlaybackPositionOverlay::Providor);
     ~AudioEditor() override;
 
     void paint(juce::Graphics&) override;
@@ -36,7 +36,7 @@ public:
     void activeSampleChanged(SampleModel&) override; 
     void fileChanged(SampleModel&) override;
     void nameChanged(SampleModel&) override;
-    void updateWaveform(std::shared_ptr<juce::File>);
+    void updateWaveform(SampleModel& modelChanged);
     void updateNameLabel(juce::String);
     void ChannelMenuChanged();
 
@@ -44,14 +44,13 @@ public:
     juce::Rectangle<int> getSliderWindowBounds();
 private:
     AudioDisplay mAudioDisplay;
+    PlaybackPositionOverlay mPlaybackOverlay; 
     juce::Slider mVerticalZoom;
     juce::Slider mHorizontalZoom;
     juce::Slider mHorizontalScroll;
     juce::ComboBox mChannelSelect;
     juce::Label mActiveSampleName;
     DataModel dataModel; 
-
-    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioEditor)
 };

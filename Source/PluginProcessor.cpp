@@ -19,10 +19,11 @@ WalsheeySampleAudioProcessor::WalsheeySampleAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), 
+       playbackPosition()
 #endif
 {
-    mSampler.addVoice(new juce::SamplerVoice()); 
+    mSampler.addVoice(new ExtendedSamplerVoice());
 }
 
 WalsheeySampleAudioProcessor::~WalsheeySampleAudioProcessor()
@@ -194,7 +195,7 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
             for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
             {
                 juce::SynthesiserSound* sound = proc.mSampler.getSound(i).get();
-                juce::SamplerSound* samplerSound = dynamic_cast<juce::SamplerSound*>(sound);
+                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(sound);
 
                 if (samplerSound != nullptr)
                 {
@@ -206,7 +207,7 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
                 }
             }
 
-            proc.mSampler.addSound(new juce::SamplerSound(juce::String(id), *reader, range, midiNote, .1, .1, 10));
+            proc.mSampler.addSound(new ExtendedSamplerSound(juce::String(id), *reader, range, midiNote, .1, .1, 10));
         }
 
         std::unique_ptr<juce::AudioFormatReader> reader; 
@@ -236,12 +237,16 @@ void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr, int id)
             for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
             {
                 juce::SynthesiserSound* sound = proc.mSampler.getSound(i).get();
-                juce::SamplerSound* samplerSound = dynamic_cast<juce::SamplerSound*>(sound);
+                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(sound);
 
                 if (samplerSound != nullptr)
                 {
                     if (samplerSound->getName() == juce::String(id))
                     {
+                        DBG(adsr.attack);
+                        DBG(adsr.decay);
+                        DBG(adsr.sustain);
+                        DBG(adsr.release);
                         samplerSound->setEnvelopeParameters(juce::ADSR::Parameters(adsr.attack, adsr.decay, adsr.sustain, adsr.release));
                         break;
                     }
@@ -264,6 +269,12 @@ void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juc
         mCommands.call(*this);
 
     mSampler.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples()); 
+
+    ExtendedSamplerVoice* voice = dynamic_cast<ExtendedSamplerVoice*>(mSampler.getVoice(0));
+    if (voice != nullptr)
+    {
+        playbackPosition = static_cast<float>(voice->getSourceSamplePosition() / voice->getSampleRate());
+    }
 }
 
     

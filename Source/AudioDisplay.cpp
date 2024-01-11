@@ -11,6 +11,51 @@
 #include <JuceHeader.h>
 #include "AudioDisplay.h"
 
+
+PlaybackPositionOverlay::PlaybackPositionOverlay(const DataModel& dm, Providor providorIn)
+    :dataModel(dm), providor(std::move(providorIn))
+{
+    dataModel.addListener(*this); 
+    startTimer(16);
+}
+
+void PlaybackPositionOverlay::paint(juce::Graphics& g)
+{
+    if (activeSample != nullptr)
+    {
+        g.setColour(juce::Colours::red);
+
+        auto xPos = timeToXPosition(); 
+        juce::Path playhead; 
+        playhead.addTriangle(juce::Point<float>(xPos - 10, 0), juce::Point<float>(xPos + 10, 0), juce::Point<float>(xPos, 10)); 
+        g.fillPath(playhead); 
+        g.drawVerticalLine(timeToXPosition(), 0, static_cast<float>(getHeight())); 
+    }
+}
+
+void PlaybackPositionOverlay::timerCallback()
+{
+    repaint(); 
+}
+
+void PlaybackPositionOverlay::activeSampleChanged(SampleModel& sm)
+{
+    if (activeSample != nullptr)
+        activeSample->removeListener(*this);
+
+    activeSample = std::make_unique<SampleModel>(sm.getState());
+
+    if (activeSample != nullptr)
+        activeSample->addListener(*this);
+}
+
+double PlaybackPositionOverlay::timeToXPosition()
+{
+    auto time = providor();  
+    return (time - activeSample->getVisibleRange().getStart()) * getWidth()
+        / activeSample->getVisibleRange().getLength();
+}
+
 //==============================================================================
 AudioDisplay::AudioDisplay()
     : mThumbnailCache(5), mVerticalZoom(1.0f), mHorizontalZoom(0), mHorizontalScroll(0), mShowChan1(true), mShowChan2(true),
@@ -18,8 +63,6 @@ AudioDisplay::AudioDisplay()
 {
     mFormatManager.registerBasicFormats();
     mThumbnail.addChangeListener(this);
-
-
 }
 
 AudioDisplay::~AudioDisplay()
