@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "SampleList.h"
+#include "UIConfig.h"
 //=========================== Sample Button ===========================
 
 SampleButton::SampleButton(juce::ValueTree vt)
@@ -28,7 +29,7 @@ SampleButton::~SampleButton()
 void SampleButton::paint(juce::Graphics& g)
 {
 
-        g.setColour(juce::Colour::fromRGB(11, 12, 14));
+        g.setColour(AppColors::backgroundColour);
 
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
 
@@ -40,7 +41,7 @@ void SampleButton::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white);
 
     if (model.isActive() == true)
-        g.setColour(juce::Colour::fromRGB(0, 102, 204));
+        g.setColour(AppColors::accentColour);
 
     g.setFont(12.0f);
     g.drawText("Button", getLocalBounds().reduced(10), juce::Justification::topLeft, true);

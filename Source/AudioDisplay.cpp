@@ -63,6 +63,9 @@ AudioDisplay::AudioDisplay()
 {
     mFormatManager.registerBasicFormats();
     mThumbnail.addChangeListener(this);
+
+
+
 }
 
 AudioDisplay::~AudioDisplay()
@@ -82,18 +85,19 @@ void AudioDisplay::paint(juce::Graphics& g)
 
 void AudioDisplay::paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(juce::Colours::darkgrey);
+    g.setColour(AppColors::backgroundColour);
     g.fillRect(thumbnailBounds);
-    g.setColour(juce::Colours::white);
+    g.setColour(AppColors::accentColour);
     g.drawFittedText("No File Loaded", thumbnailBounds, juce::Justification::centred, 1);
 }
 
 void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(juce::Colour::fromRGB(11, 12, 14));
+    g.setColour(AppColors::backgroundColour);
     g.fillRect(thumbnailBounds);
 
-    g.setColour(juce::Colour::fromRGB(0, 102, 204));
+    g.setColour(AppColors::accentColour);
+
 
     double startTime = mThumbnail.getTotalLength() * mHorizontalScroll;
     double endTime = startTime + (mThumbnail.getTotalLength() * (1 - mHorizontalZoom));
@@ -110,6 +114,7 @@ void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& th
     {
         mThumbnail.drawChannels(g, thumbnailBounds, startTime, endTime, mVerticalZoom);
     }
+
 }
 
 void AudioDisplay::changeListenerCallback(juce::ChangeBroadcaster* source)

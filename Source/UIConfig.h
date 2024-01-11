@@ -13,11 +13,18 @@
 
 namespace AppColors
 {
-    // Define colors using RGBA values
-    static const juce::Colour backgroundColour = juce::Colour::fromRGBA(30, 30, 30, 255);
-    static const juce::Colour accentColour = juce::Colour::fromRGBA(180, 70, 70, 255);
 
-    // Or define colors using hexadecimal
-    static const juce::Colour primaryColour = juce::Colour::fromString("#FF5733");
-    static const juce::Colour secondaryColour = juce::Colour::fromString("#33FF57");
+    static const juce::Colour blue = juce::Colour::fromRGB(0, 102, 204);
+    static const juce::Colour darkBlue = juce::Colour::fromRGB(11, 12, 14);
+
+    static const juce::Colour purple = juce::Colour::fromRGB(208, 0, 255);
+    static const juce::Colour darkPurple = juce::Colour::fromRGB(42,0,51);
+    static const juce::Colour Silver = juce::Colour::fromRGB(192,192,192);
+   
+    // Define colors using RGBA values
+    static const juce::Colour mainWindowColour = Silver;
+    static const juce::Colour backgroundColour = darkBlue;
+    static const juce::Colour accentColour = blue;
+
+
 }

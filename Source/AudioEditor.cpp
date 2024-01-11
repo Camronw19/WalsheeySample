@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "AudioEditor.h"
+#include "UIConfig.h"
 
 //==============================================================================
 AudioEditor::AudioEditor(const DataModel& dm, PlaybackPositionOverlay::Providor providor)
@@ -22,22 +23,22 @@ AudioEditor::AudioEditor(const DataModel& dm, PlaybackPositionOverlay::Providor 
 
     addAndMakeVisible(mActiveSampleName);
     mActiveSampleName.setJustificationType(juce::Justification::centred);
-    mActiveSampleName.setColour(juce::Label::textColourId, juce::Colour::fromRGB(11, 12, 14));
-    mActiveSampleName.setColour(juce::Label::outlineColourId, juce::Colour::fromRGB(11, 12, 14));
+    mActiveSampleName.setColour(juce::Label::textColourId, AppColors::backgroundColour);
+    mActiveSampleName.setColour(juce::Label::outlineColourId, AppColors::backgroundColour);
 
     //Zoom sliders
     mVerticalZoom.addListener(this);
     mVerticalZoom.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mVerticalZoom.setValue(0.0, juce::dontSendNotification);
     mVerticalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    mVerticalZoom.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
+    mVerticalZoom.setColour(juce::Slider::thumbColourId, AppColors::accentColour);
     addAndMakeVisible(mVerticalZoom);
 
     mHorizontalZoom.addListener(this);
     mHorizontalZoom.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     mHorizontalZoom.setValue(0., juce::dontSendNotification);
     mHorizontalZoom.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    mHorizontalZoom.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
+    mHorizontalZoom.setColour(juce::Slider::thumbColourId, AppColors::accentColour);
     addAndMakeVisible(mHorizontalZoom);
 
     //Scroll sliders
@@ -45,8 +46,8 @@ AudioEditor::AudioEditor(const DataModel& dm, PlaybackPositionOverlay::Providor 
     mHorizontalScroll.setSliderStyle(juce::Slider::LinearHorizontal);
     mHorizontalScroll.setValue(0.0, juce::dontSendNotification);
     mHorizontalScroll.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
-    mHorizontalScroll.setColour(juce::Slider::rotarySliderFillColourId, juce::Colour::fromRGB(0, 102, 204));
-    mHorizontalScroll.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
+    mHorizontalScroll.setColour(juce::Slider::rotarySliderFillColourId, AppColors::accentColour);
+    mHorizontalScroll.setColour(juce::Slider::thumbColourId, AppColors::accentColour);
     addAndMakeVisible(mHorizontalScroll);
 
     //ChannelSelect Menu
@@ -65,7 +66,7 @@ AudioEditor::~AudioEditor()
 
 void AudioEditor::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colour::fromRGB(11, 12, 14));
+    g.setColour(AppColors::backgroundColour);
     g.drawRect(getLocalBounds().toFloat());
   
     float linePositionY = getLocalBounds().getHeight() * 0.75;

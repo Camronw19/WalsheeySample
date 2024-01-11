@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "Model.h"
+#include "UIConfig.h"
 //==============================================================================
 /*
 */
@@ -67,11 +68,15 @@ private:
     juce::AudioThumbnailCache mThumbnailCache;
     juce::AudioThumbnail mThumbnail;
 
+    
+
     double mVerticalZoom;
     double mHorizontalZoom;
     double mHorizontalScroll;
     bool mShowChan1;
     bool mShowChan2;
+
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioDisplay)
 };

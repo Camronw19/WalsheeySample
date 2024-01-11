@@ -15,6 +15,7 @@
 #include "SampleList.h"
 #include "AudioEditor.h"
 #include "ADSRView.h"
+#include "UIConfig.h"
 #include "AudioDisplay.h"
 
 class MainSamplerView : public juce::Component, 

@@ -29,7 +29,7 @@ MainSamplerView::~MainSamplerView()
 void MainSamplerView::paint(juce::Graphics& g)
 {
 
-    g.setColour(juce::Colour::fromRGB(192, 192, 192));
+    g.setColour(AppColors::mainWindowColour);
     g.fillAll(); 
 
     g.setColour(juce::Colour::fromRGB(11, 12, 14));

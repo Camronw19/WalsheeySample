@@ -13,7 +13,7 @@
 #include <JuceHeader.h>
 #include <vector>
 #include "Model.h"
-
+#include "UIConfig.h"
 //==============================================================================
 /*
 */

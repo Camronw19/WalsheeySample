@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "ADSRView.h"
+#include "UIConfig.h"
 
 //==============================================================================
 ADSRView::ADSRView(const DataModel& dm)
@@ -22,23 +23,22 @@ ADSRView::ADSRView(const DataModel& dm)
     {
         slider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0); 
         slider->setSliderStyle(juce::Slider::RotaryVerticalDrag); 
-        slider->setColour(juce::Slider::textBoxTextColourId, juce::Colour::fromRGB(11, 12, 14));
-        slider->setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(0, 102, 204));
-        slider->addListener(this); 
         addAndMakeVisible(slider); 
+        slider->addListener(this); 
+        slider->setColour(juce::Slider::textBoxTextColourId, AppColors::backgroundColour);
+        slider->setColour(juce::Slider::thumbColourId, AppColors::accentColour);
     }
 
     attackSlider.setRange(.1, 5, .1); 
     decaySlider.setRange(.1, 5, .1);
-    sustainSlider.setRange(.1, 5, .1);
-    releaseSlider.setRange(0, 1, .1);
+    sustainSlider.setRange(.1, 1, .01);
+    releaseSlider.setRange(0, 5, .1);
 
     //Initialize labels
     for (auto& label : getLabels())
     {
         label->setJustificationType(juce::Justification::centred);
-        label->setColour(juce::Label::textColourId, juce::Colour::fromRGB(11, 12, 14));
-        addAndMakeVisible(label); 
+        label->setColour(juce::Label::textColourId, AppColors::backgroundColour);
     }
 
     sampleLabel.setJustificationType(juce::Justification::left); 
@@ -54,7 +54,8 @@ ADSRView::~ADSRView()
 
 void ADSRView::paint (juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::silver);
+    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll(AppColors::mainWindowColour);
 }
 
 void ADSRView::resized()
