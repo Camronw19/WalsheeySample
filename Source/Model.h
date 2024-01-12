@@ -444,6 +444,7 @@ public:
     public:
         virtual ~Listener() noexcept = default;
         virtual void activeSampleChanged(SampleModel&) {}
+        virtual void fileChanged(SampleModel&) {}
     };
 
     explicit DataModel()
@@ -502,6 +503,10 @@ private:
                         
                 activeSample = treeChanged;
                 listenerList.call([&](Listener& l) { l.activeSampleChanged(SampleModel(treeChanged)); });
+            }
+            else if (property == IDs::file)
+            {
+                listenerList.call([&](Listener& l) { l.fileChanged(SampleModel(treeChanged)); });
             }
             
         }

@@ -31,6 +31,7 @@ public:
     void resized() override;
 
     void setThumbnailSource(const juce::File& inputSource);
+
 private:
     //Component Listener
     void sliderValueChanged(juce::Slider* slider) override;
@@ -50,13 +51,14 @@ private:
     void updateVisibleRange(const juce::Range<double>&);
     void updateScrollRange(); 
     void updateZoomRange(); 
+    void initializeComponents(); 
 
     juce::Rectangle<int> getWaveformWindowBounds();
     juce::Rectangle<int> getSliderWindowBounds();
 
-    DataModel dataModel; 
-    VisibleRangeDataModel visibleRange; 
-    std::unique_ptr<SampleModel> activeSample; 
+    DataModel mDataModel; 
+    VisibleRangeDataModel mVisibleRange; 
+    std::unique_ptr<SampleModel> mActiveSample; 
 
     AudioDisplay mAudioDisplay;
     PlaybackPositionOverlay mPlaybackOverlay; 

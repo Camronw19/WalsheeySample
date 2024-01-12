@@ -12,11 +12,11 @@
 
 
 MainSamplerView::MainSamplerView(const DataModel& dataModel, PlaybackPositionOverlay::Providor providor)
-    :mDataModel(dataModel), sampleButtons(dataModel.getState()), mAudioEditor(dataModel, std::move(providor)), mADSRView(dataModel)
+    :mDataModel(dataModel), mSampleButtons(dataModel.getState()), mAudioEditor(dataModel, std::move(providor)), mADSRView(dataModel)
 {
     mDataModel.addListener(*this); 
 
-    addAndMakeVisible(sampleButtons); 
+    addAndMakeVisible(mSampleButtons); 
     addAndMakeVisible(mAudioEditor);
     addAndMakeVisible(mADSRView); 
 }
@@ -31,9 +31,6 @@ void MainSamplerView::paint(juce::Graphics& g)
 
     g.setColour(AppColors::mainWindowColour);
     g.fillAll(); 
-
-    g.setColour(juce::Colour::fromRGB(11, 12, 14));
-    g.drawRect(getLocalBounds().toFloat());
 }
 
 void MainSamplerView::resized()
@@ -43,5 +40,5 @@ void MainSamplerView::resized()
 
     mAudioEditor.setBounds(bounds.removeFromTop(height));
     mADSRView.setBounds(bounds.removeFromTop(height));
-    sampleButtons.setBounds(bounds.removeFromTop(height));
+    mSampleButtons.setBounds(bounds.removeFromTop(height));
 }

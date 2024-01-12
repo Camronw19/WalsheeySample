@@ -13,20 +13,21 @@
 
 
 PlaybackPositionOverlay::PlaybackPositionOverlay(const VisibleRangeDataModel& vrdm, Providor providorIn)
-    :providor(std::move(providorIn)), visibleRange(vrdm)
+    :mProvidor(std::move(providorIn)), mVisibleRange(vrdm)
 {
     startTimer(16);
 }
 
 void PlaybackPositionOverlay::paint(juce::Graphics& g)
 {
-    if (visibleRange.getTotalRange().getLength() > 0)
+    if (mVisibleRange.getTotalRange().getLength() > 0)
     {
         g.setColour(juce::Colours::red);
-
         auto xPos = timeToXPosition();
         juce::Path playhead;
+
         playhead.addTriangle(juce::Point<float>(xPos - 10, 0), juce::Point<float>(xPos + 10, 0), juce::Point<float>(xPos, 10));
+
         g.fillPath(playhead);
         g.drawVerticalLine(timeToXPosition(), 0, static_cast<float>(getHeight()));
     }
@@ -37,16 +38,11 @@ void PlaybackPositionOverlay::timerCallback()
     repaint(); 
 }
 
-
-void PlaybackPositionOverlay::visibleRangeChanged(juce::Range<double>)
-{
-
-}
-
 double PlaybackPositionOverlay::timeToXPosition()
 {
-    auto time = providor();  
-    auto range = visibleRange.getVisibleRange(); 
+    auto time = mProvidor();
+    auto range = mVisibleRange.getVisibleRange();
+
     return (time - range.getStart()) * getWidth()
         / range.getLength();
 }
@@ -80,6 +76,7 @@ void AudioDisplay::paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& 
 {
     g.setColour(AppColors::backgroundColour);
     g.fillRect(thumbnailBounds);
+
     g.setColour(AppColors::accentColour);
     g.drawFittedText("No File Loaded", thumbnailBounds, juce::Justification::centred, 1);
 }
@@ -89,10 +86,10 @@ void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& th
     g.setColour(AppColors::backgroundColour);
     g.fillRect(thumbnailBounds);
 
-    g.setColour(AppColors::accentColour);
-
     auto startTime = mVisibleRange.getVisibleRange().getStart();
     auto endTime = mVisibleRange.getVisibleRange().getEnd();
+
+    g.setColour(AppColors::accentColour);
 
     if (mShowChan1 && !mShowChan2)
     {
@@ -106,16 +103,12 @@ void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& th
     {
         mThumbnail.drawChannels(g, thumbnailBounds, startTime, endTime, 1);
     }
-
 }
 
 void AudioDisplay::changeListenerCallback(juce::ChangeBroadcaster* source)
 {
-    // If the Thumbnail object has changed
     if (source == &mThumbnail)
-    {
         thumbnailChanged();
-    }
 }
 
 void AudioDisplay::thumbnailChanged()

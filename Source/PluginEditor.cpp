@@ -40,10 +40,12 @@ void WalsheeySampleAudioProcessorEditor::resized()
     mMainSamplerView.setBounds(getLocalBounds()); 
 }
 
-void WalsheeySampleAudioProcessorEditor::fileChanged(std::shared_ptr<juce::File> file)
+void WalsheeySampleAudioProcessorEditor::fileChanged(SampleModel& ModelChanged)
 {
+    auto file = ModelChanged.getAudioFile(); 
     if (file->exists())
-        audioProcessor.setSample(std::unique_ptr<juce::AudioFormatReader>(mFormatManager.createReaderFor(*file)), mActiveSample->getMidiNote(), mActiveSample->getId());
+        audioProcessor.setSample(std::unique_ptr<juce::AudioFormatReader>(mFormatManager.createReaderFor(*file)), ModelChanged.getMidiNote(), ModelChanged.getId());
+
 }
 
 void WalsheeySampleAudioProcessorEditor::activeSampleChanged(SampleModel& sm)
@@ -55,8 +57,6 @@ void WalsheeySampleAudioProcessorEditor::activeSampleChanged(SampleModel& sm)
 
     if (mActiveSample != nullptr)
         mActiveSample->addListener(*this);
-
-    fileChanged(mActiveSample->getAudioFile()); 
 }
 
 void WalsheeySampleAudioProcessorEditor::adsrChanged(ADSRParameters adsrParams)

@@ -17,14 +17,6 @@
 /**
 */
 
-class DummySound : public juce::SynthesiserSound
-{
-public:
-    bool appliesToNote(int) override { return false; }
-    bool appliesToChannel(int) override { return false; }
-};
-
-
 class WalsheeySampleAudioProcessor  : public juce::AudioProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
@@ -78,7 +70,7 @@ public:
 private:
     juce::Synthesiser mSampler; 
     CommandFifo<WalsheeySampleAudioProcessor> mCommands; 
-    juce::SpinLock commandQueueMutex;
+    juce::SpinLock mCommandQueueMutex;
 
     juce::Atomic<float> playbackPosition; 
     //==============================================================================

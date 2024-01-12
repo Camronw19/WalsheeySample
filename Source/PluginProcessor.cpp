@@ -150,7 +150,7 @@ bool WalsheeySampleAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* WalsheeySampleAudioProcessor::createEditor()
 {
-    juce::SpinLock::ScopedLockType lock(commandQueueMutex);
+    juce::SpinLock::ScopedLockType lock(mCommandQueueMutex);
     return new WalsheeySampleAudioProcessorEditor (*this);
 }
 
@@ -182,10 +182,7 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
     {
     public:
         SetSampleCommand(std::unique_ptr<juce::AudioFormatReader> r, int mNote, int identifier)
-            :reader(std::move(r)), midiNote(mNote), id(identifier)
-        {
-
-        }
+            :reader(std::move(r)), midiNote(mNote), id(identifier) {}
 
         void operator() (WalsheeySampleAudioProcessor& proc)
         {
@@ -194,8 +191,7 @@ void WalsheeySampleAudioProcessor::setSample(std::unique_ptr<juce::AudioFormatRe
 
             for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
             {
-                juce::SynthesiserSound* sound = proc.mSampler.getSound(i).get();
-                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(sound);
+                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(proc.mSampler.getSound(i).get());
 
                 if (samplerSound != nullptr)
                 {
@@ -227,17 +223,13 @@ void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr, int id)
     {
     public:
         SetADSRCommand(ADSRParameters adsrParams, int identifier)
-            :adsr(adsrParams), id(identifier)
-        {
-
-        }
+            :adsr(adsrParams), id(identifier) {}
 
         void operator() (WalsheeySampleAudioProcessor& proc)
         {
             for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
             {
-                juce::SynthesiserSound* sound = proc.mSampler.getSound(i).get();
-                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(sound);
+                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(proc.mSampler.getSound(i).get());
 
                 if (samplerSound != nullptr)
                 {
@@ -259,7 +251,7 @@ void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr, int id)
 
 void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    const juce::GenericScopedTryLock<juce::SpinLock> lock(commandQueueMutex);
+    const juce::GenericScopedTryLock<juce::SpinLock> lock(mCommandQueueMutex);
 
     if (lock.isLocked())
         mCommands.call(*this);

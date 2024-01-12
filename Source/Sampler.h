@@ -11,22 +11,6 @@
 #pragma once
 #include <JuceHeader.h>
 
-//Represents the constant parts of an audio sample
-class Sample
-{
-public: 
-    Sample(juce::AudioFormatReader& source, double maxSampleLengthSecs);
-
-    int getLength() const { return length; }
-    double getSampleRate() const { return sampleRate; }
-    const juce::AudioBuffer<float>& getBuffer() const { return data;  }
-
-private: 
-    int length; 
-    double sampleRate; 
-    juce::AudioBuffer<float> data; 
-};
-
 //=====================================================================
 class ExtendedSamplerSound : public juce::SynthesiserSound
 {

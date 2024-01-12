@@ -19,7 +19,7 @@
 #include "AudioDisplay.h"
 
 class MainSamplerView : public juce::Component, 
-                        public DataModel::Listener
+                        private DataModel::Listener
 {
 public:
     MainSamplerView(const DataModel& dataModel, PlaybackPositionOverlay::Providor); 
@@ -31,7 +31,7 @@ public:
 private:
     DataModel mDataModel; 
 
-    SampleList sampleButtons; 
+    SampleList mSampleButtons; 
     AudioEditor mAudioEditor; 
     ADSRView mADSRView; 
 };

@@ -18,31 +18,36 @@
 /*
 */
 class ADSRView  : public juce::Component, 
-                  public DataModel::Listener, 
                   public juce::Slider::Listener, 
-                  public SampleModel::Listener
+                  private DataModel::Listener, 
+                  private SampleModel::Listener
 {
 public:
-    ADSRView(const DataModel& dataModel);
+    ADSRView(const DataModel&);
     ~ADSRView() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void sliderValueChanged(juce::Slider* slider) override;
-    void activeSampleChanged(SampleModel&) override;
-
+private:
+    // Sample model listener
     void nameChanged(juce::String) override; 
 
+    // Data model listener
+    void activeSampleChanged(SampleModel&) override;
+
+    // Slider listener 
+    void sliderValueChanged(juce::Slider*) override;
+
+    // Helper methods
     std::vector<juce::Slider*> getSliders();
     std::vector<juce::Label*> getLabels();
 
-private:
-    juce::Slider attackSlider, decaySlider, sustainSlider, releaseSlider; 
-    juce::Label sampleLabel, attackLabel, decayLabel, sustainLabel, releaseLabel; 
+    juce::Slider mAttackSlider, mDecaySlider, mSustainSlider, mReleaseSlider; 
+    juce::Label mSampleLabel, mAttackLabel, mDecayLabel, mSustainLabel, mReleaseLabel; 
     
-    DataModel dataModel;
-    std::unique_ptr<SampleModel> activeSample; 
+    DataModel mDataModel;
+    std::unique_ptr<SampleModel> mActiveSample; 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ADSRView)
 };

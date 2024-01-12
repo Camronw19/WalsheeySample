@@ -18,23 +18,20 @@
 */
 
 class PlaybackPositionOverlay : public juce::Component, 
-                                private juce::Timer,
-                                private VisibleRangeDataModel::Listener
+                                private juce::Timer
 {
 public: 
     using Providor = std::function<float()>; 
     PlaybackPositionOverlay(const VisibleRangeDataModel&, Providor);
 
     void paint(juce::Graphics&) override; 
-    void timerCallback() override; 
-
-    virtual void visibleRangeChanged(juce::Range<double>) override; 
-
-    double timeToXPosition(); 
 
 private: 
-    Providor providor; 
-    VisibleRangeDataModel visibleRange; 
+    void timerCallback() override; 
+    double timeToXPosition(); 
+
+    Providor mProvidor; 
+    VisibleRangeDataModel mVisibleRange; 
 };
 
 class AudioDisplay : public juce::Component,
@@ -46,21 +43,25 @@ public:
     ~AudioDisplay() override;
 
     void paint(juce::Graphics&) override;
-    void paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds);
-    void paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds);
 
     void resized() override;
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
-    void setThumbnailSource(const juce::File& inputSource);
-    void thumbnailChanged();
 
+    void setThumbnailSource(const juce::File& inputSource);
     void setShowChannels(bool chan1, bool chan2);
-    std::pair<bool, bool> getShowChannels();
+
+private:
+    //Callbacks
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    void thumbnailChanged();
 
     //Visible Range Listener
     virtual void visibleRangeChanged(juce::Range<double>) override;
 
-private:
+    //Helper methods
+    void paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds);
+    void paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds);
+    std::pair<bool, bool> getShowChannels();
+
     juce::AudioFormatManager mFormatManager;
     juce::AudioThumbnailCache mThumbnailCache;
     juce::AudioThumbnail mThumbnail;

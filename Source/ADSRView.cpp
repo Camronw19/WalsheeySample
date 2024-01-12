@@ -14,38 +14,39 @@
 
 //==============================================================================
 ADSRView::ADSRView(const DataModel& dm)
-    :dataModel(dm)
+    :mDataModel(dm)
 {
-    dataModel.addListener(*this); 
+    mDataModel.addListener(*this); 
 
-    //Initialize sliders 
+    // Initialize sliders 
     for (auto& slider : getSliders())
     {
         slider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0); 
         slider->setSliderStyle(juce::Slider::RotaryVerticalDrag); 
-        addAndMakeVisible(slider); 
-        slider->addListener(this); 
         slider->setColour(juce::Slider::textBoxTextColourId, AppColors::backgroundColour);
         slider->setColour(juce::Slider::thumbColourId, AppColors::accentColour);
+        slider->addListener(this); 
+        addAndMakeVisible(slider); 
     }
 
-    attackSlider.setRange(.1, 5, .1); 
-    decaySlider.setRange(.1, 5, .1);
-    sustainSlider.setRange(.1, 1, .01);
-    releaseSlider.setRange(0, 5, .1);
+    mAttackSlider.setRange(.1, 5, .1); 
+    mDecaySlider.setRange(.1, 5, .1);
+    mSustainSlider.setRange(.1, 1, .01);
+    mReleaseSlider.setRange(0, 5, .1);
 
-    //Initialize labels
+    // Initialize labels
     for (auto& label : getLabels())
     {
         label->setJustificationType(juce::Justification::centred);
         label->setColour(juce::Label::textColourId, AppColors::backgroundColour);
+        addAndMakeVisible(label); 
     }
 
-    sampleLabel.setJustificationType(juce::Justification::left); 
-    attackLabel.setText("Attack", juce::dontSendNotification);
-    decayLabel.setText("Decay", juce::dontSendNotification);
-    sustainLabel.setText("Sustain", juce::dontSendNotification);
-    releaseLabel.setText("Release", juce::dontSendNotification); 
+    mSampleLabel.setJustificationType(juce::Justification::left); 
+    mAttackLabel.setText("Attack", juce::dontSendNotification);
+    mDecayLabel.setText("Decay", juce::dontSendNotification);
+    mSustainLabel.setText("Sustain", juce::dontSendNotification);
+    mReleaseLabel.setText("Release", juce::dontSendNotification); 
 }
 
 ADSRView::~ADSRView()
@@ -54,83 +55,79 @@ ADSRView::~ADSRView()
 
 void ADSRView::paint (juce::Graphics& g)
 {
-    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
     g.fillAll(AppColors::mainWindowColour);
 }
 
 void ADSRView::resized()
 {
     auto bounds = getLocalBounds(); 
-
-    sampleLabel.setBounds(bounds.removeFromTop(20));
+    auto labelBounds = bounds.removeFromBottom(20); 
+    mSampleLabel.setBounds(bounds.removeFromTop(20));
 
     auto width = getWidth() / 4;
-    auto labelBounds = bounds.removeFromBottom(20); 
 
-    attackLabel.setBounds(labelBounds.removeFromLeft(width));
-    decayLabel.setBounds(labelBounds.removeFromLeft(width));
-    sustainLabel.setBounds(labelBounds.removeFromLeft(width));
-    releaseLabel.setBounds(labelBounds.removeFromLeft(width));
-
+    for (auto& label : getLabels())
+        label->setBounds(labelBounds.removeFromLeft(width));
+   
     for (auto& slider : getSliders())
         slider->setBounds(bounds.removeFromLeft(width)); 
 }
 
 void ADSRView::sliderValueChanged(juce::Slider* slider)
 {
-    if (activeSample != nullptr)
+    if (mActiveSample != nullptr)
     {
-        if (slider == &attackSlider)
+        if (slider == &mAttackSlider)
         {
-            activeSample->setAttack(attackSlider.getValue()); 
+            mActiveSample->setAttack(mAttackSlider.getValue()); 
         }
-        else if (slider == &decaySlider)
+        else if (slider == &mDecaySlider)
         {
-            activeSample->setDecay(decaySlider.getValue());
+            mActiveSample->setDecay(mDecaySlider.getValue());
         }
-        else if (slider == &sustainSlider)
+        else if (slider == &mSustainSlider)
         {
-            activeSample->setSustain(sustainSlider.getValue());
+            mActiveSample->setSustain(mSustainSlider.getValue());
         }
-        else if (slider == &releaseSlider)
+        else if (slider == &mReleaseSlider)
         {
-            activeSample->setRelease(releaseSlider.getValue());
+            mActiveSample->setRelease(mReleaseSlider.getValue());
         }
     }
 }
 
 void ADSRView::activeSampleChanged(SampleModel& sm)
 {
-    if (activeSample != nullptr)
-        activeSample->removeListener(*this);
+    if (mActiveSample != nullptr)
+        mActiveSample->removeListener(*this);
 
-    activeSample = std::make_unique<SampleModel>(sm.getState()); 
+    mActiveSample = std::make_unique<SampleModel>(sm.getState()); 
 
-    if (activeSample != nullptr)
-        activeSample->addListener(*this); 
+    if (mActiveSample != nullptr)
+        mActiveSample->addListener(*this); 
 
     //Set ADSR parameters
-    ADSRParameters params = activeSample->getADSR(); 
-    attackSlider.setValue(params.attack);
-    decaySlider.setValue(params.decay);
-    sustainSlider.setValue(params.sustain);
-    releaseSlider.setValue(params.release);
+    ADSRParameters params = mActiveSample->getADSR(); 
+    mAttackSlider.setValue(params.attack);
+    mDecaySlider.setValue(params.decay);
+    mSustainSlider.setValue(params.sustain);
+    mReleaseSlider.setValue(params.release);
 
     //Set sample label 
-    sampleLabel.setText(activeSample->getName(), juce::dontSendNotification); 
+    mSampleLabel.setText(mActiveSample->getName(), juce::dontSendNotification); 
 }
 
 void ADSRView::nameChanged(juce::String name)
 {
-    sampleLabel.setText(name, juce::dontSendNotification);
+    mSampleLabel.setText(name, juce::dontSendNotification);
 }
 
 std::vector<juce::Slider*> ADSRView::getSliders()
 {
-    return { &attackSlider, &decaySlider, &sustainSlider, &releaseSlider };
+    return { &mAttackSlider, &mDecaySlider, &mSustainSlider, &mReleaseSlider };
 }
 
 std::vector<juce::Label*> ADSRView::getLabels()
 {
-    return { &sampleLabel, &attackLabel, &decayLabel, &sustainLabel, &releaseLabel };
+    return { &mSampleLabel, &mAttackLabel, &mDecayLabel, &mSustainLabel, &mReleaseLabel };
 }
