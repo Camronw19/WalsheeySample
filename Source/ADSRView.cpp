@@ -67,7 +67,10 @@ void ADSRView::resized()
     auto width = getWidth() / 4;
 
     for (auto& label : getLabels())
-        label->setBounds(labelBounds.removeFromLeft(width));
+    {
+        if(label != &mSampleLabel)
+            label->setBounds(labelBounds.removeFromLeft(width));
+    }
    
     for (auto& slider : getSliders())
         slider->setBounds(bounds.removeFromLeft(width)); 
