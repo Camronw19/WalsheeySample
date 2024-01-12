@@ -30,9 +30,11 @@ public:
     juce::AudioBuffer<float>* getAudioData() const noexcept { return data.get(); }
 
     void setEnvelopeParameters(juce::ADSR::Parameters parametersToUse) { params = parametersToUse; }
+    void setPitchShift(int); 
 
     bool appliesToNote(int midiNoteNumber) override;
     bool appliesToChannel(int midiChannel) override;
+
 
 private:
     //==============================================================================
@@ -44,6 +46,7 @@ private:
     juce::BigInteger midiNotes;
     int length = 0, midiRootNote = 0;
 
+    int pitchShiftSemitones = 0; 
     juce::ADSR::Parameters params;
 
     JUCE_LEAK_DETECTOR(ExtendedSamplerSound)

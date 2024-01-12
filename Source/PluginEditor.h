@@ -37,6 +37,7 @@ private:
 
     //Sample model listener
     virtual void adsrChanged(ADSRParameters) override; 
+    virtual void pitchShiftChanged(int) override; 
 
     DataModel mDataModel;
     std::unique_ptr<SampleModel> mActiveSample; 

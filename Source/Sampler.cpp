@@ -51,6 +51,11 @@ bool ExtendedSamplerSound::appliesToChannel(int /*midiChannel*/)
     return true;
 }
 
+void ExtendedSamplerSound::setPitchShift(int semitones)
+{
+    pitchShiftSemitones = juce::Range<int>(-12, 12).clipValue(semitones); 
+}
+
 //================================================================================
 ExtendedSamplerVoice::ExtendedSamplerVoice() {}
 ExtendedSamplerVoice::~ExtendedSamplerVoice() {}
@@ -67,7 +72,7 @@ void ExtendedSamplerVoice::startNote(int midiNoteNumber, float velocity, juce::S
         isNotePlaying = true; 
         sourceSampleRate = sound->sourceSampleRate; 
 
-        pitchRatio = std::pow(2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
+        pitchRatio = std::pow(2.0, (midiNoteNumber - sound->midiRootNote + sound->pitchShiftSemitones) / 12.0)
             * sound->sourceSampleRate / getSampleRate();
 
         sourceSamplePosition = 0.0;

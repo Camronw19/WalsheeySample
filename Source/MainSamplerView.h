@@ -34,4 +34,5 @@ private:
     SampleList mSampleButtons; 
     AudioEditor mAudioEditor; 
     ADSRView mADSRView; 
+    PitchView mPitchView; 
 };

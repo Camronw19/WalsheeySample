@@ -64,6 +64,7 @@ public:
 
     void setSample(std::unique_ptr<juce::AudioFormatReader>, int, int);
     void setADSR(ADSRParameters, int); 
+    void setPitchShift(int, int); 
 
     float getPlaybackPosition() { return playbackPosition.get(); }
 

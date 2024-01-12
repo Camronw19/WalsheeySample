@@ -249,6 +249,40 @@ void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr, int id)
      mCommands.push(SetADSRCommand(adsr, id));
 }
 
+void WalsheeySampleAudioProcessor::setPitchShift(int semitones, int id)
+{
+    class SetPitchShiftCommand
+    {
+    public:
+        SetPitchShiftCommand(int semitones, int identifier)
+            :pitchShiftSemitones(semitones), id(identifier)
+        {
+        }
+
+        void operator() (WalsheeySampleAudioProcessor& proc)
+        {
+            for (int i = 0; i < proc.mSampler.getNumSounds(); ++i)
+            {
+                ExtendedSamplerSound* samplerSound = dynamic_cast<ExtendedSamplerSound*>(proc.mSampler.getSound(i).get());
+
+                if (samplerSound != nullptr)
+                {
+                    if (samplerSound->getName() == juce::String(id))
+                    {
+                        samplerSound->setPitchShift(pitchShiftSemitones);
+                        break;
+                    }
+                }
+            }
+        }
+
+        int pitchShiftSemitones; 
+        int id;
+    };
+
+    mCommands.push(SetPitchShiftCommand(semitones, id));
+}
+
 void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     const juce::GenericScopedTryLock<juce::SpinLock> lock(mCommandQueueMutex);

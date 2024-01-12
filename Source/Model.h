@@ -27,6 +27,7 @@ namespace IDs
     DECLARE_ID(isActive)
     DECLARE_ID(midiNote)
     DECLARE_ID(adsr)
+    DECLARE_ID(pitchShift)
     DECLARE_ID(totalRange)
 
     DECLARE_ID(VISIBLE_RANGE)
@@ -246,6 +247,7 @@ public:
         virtual void isActiveChanged(bool) {}
         virtual void midiNoteChanged(int) {}
         virtual void adsrChanged(ADSRParameters) {}
+        virtual void pitchShiftChanged(int) {}
     };
 
      explicit SampleModel()
@@ -259,7 +261,8 @@ public:
         midiNote(getState(), IDs::midiNote, nullptr),
         adsr(getState(), IDs::adsr, nullptr),
         isActiveSample(getState(), IDs::isActive, nullptr),
-        totalRange(getState(), IDs::totalRange, nullptr)
+        totalRange(getState(), IDs::totalRange, nullptr), 
+        pitchShift(getState(), IDs::pitchShift, nullptr)
     {
         jassert(getState().hasType(IDs::SAMPLE));
         formatManager.registerBasicFormats(); 
@@ -331,6 +334,12 @@ public:
         totalRange.setValue(range, nullptr); 
     }
 
+    void setPitchShift(int semitones)
+    {
+        int constrainedSemitones = juce::Range<int>(-12, 12).clipValue(semitones); 
+        pitchShift.setValue(constrainedSemitones, nullptr); 
+    }
+
     //============ Getter Methods ============
     juce::String getName() const 
     {
@@ -373,6 +382,11 @@ public:
             return true;
         else
             return false; 
+    }
+
+    int getPitchShift()
+    {
+        return pitchShift; 
     }
 
     //============Listener Methods============
@@ -420,6 +434,11 @@ private:
                 adsr.forceUpdateOfCachedValue(); 
                 listenerList.call([&](Listener& l) { l.adsrChanged(adsr); });
             }
+            else if (property == IDs::pitchShift)
+            {
+                pitchShift.forceUpdateOfCachedValue(); 
+                listenerList.call([&](Listener& l) { l.pitchShiftChanged(pitchShift); });
+            }
         }
     }
 
@@ -428,6 +447,7 @@ private:
     juce::CachedValue<std::shared_ptr<juce::File>> audioFile;
     juce::CachedValue<int> midiNote; 
     juce::CachedValue<ADSRParameters> adsr; 
+    juce::CachedValue<int> pitchShift; 
     juce::CachedValue<bool> isActiveSample; 
     juce::CachedValue<juce::Range<double>> totalRange;
 

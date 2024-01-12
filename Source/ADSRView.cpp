@@ -131,3 +131,74 @@ std::vector<juce::Label*> ADSRView::getLabels()
 {
     return { &mSampleLabel, &mAttackLabel, &mDecayLabel, &mSustainLabel, &mReleaseLabel };
 }
+
+
+//===============================================================
+
+PitchView::PitchView(const DataModel& dm)
+    :mDataModel(dm)
+{
+    mDataModel.addListener(*this); 
+
+    mPitchLabel.setText("Pitch Shift", juce::dontSendNotification); 
+    mPitchLabel.setJustificationType(juce::Justification::centred);
+    mPitchLabel.setColour(juce::Label::textColourId, AppColors::backgroundColour);
+    addAndMakeVisible(mPitchLabel);
+
+    mPitchSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+    mPitchSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
+    mPitchSlider.setColour(juce::Slider::textBoxTextColourId, AppColors::backgroundColour);
+    mPitchSlider.setColour(juce::Slider::thumbColourId, AppColors::accentColour);
+    mPitchSlider.setRange(juce::Range<double>(-12, 12), 1); 
+    mPitchSlider.addListener(this);
+    addAndMakeVisible(mPitchSlider);
+}
+
+PitchView::~PitchView()
+{
+    mDataModel.removeListener(*this); 
+}
+
+void PitchView::paint(juce::Graphics&)
+{
+
+}
+
+void PitchView::resized()
+{
+    auto bounds = getLocalBounds(); 
+    auto labelBounds = bounds.removeFromBottom(20); 
+
+    mPitchLabel.setBounds(labelBounds); 
+    mPitchSlider.setBounds(bounds); 
+}
+
+void PitchView::nameChanged(juce::String)
+{
+
+}
+
+void PitchView::activeSampleChanged(SampleModel& sm)
+{
+    mPitchSlider.setValue(sm.getPitchShift()); 
+
+    if (mActiveSample != nullptr)
+        mActiveSample->removeListener(*this);
+
+    mActiveSample = std::make_unique<SampleModel>(sm.getState());
+
+    if (mActiveSample != nullptr)
+        mActiveSample->addListener(*this);
+}
+
+void PitchView::sliderValueChanged(juce::Slider* sliderChanged)
+{
+
+    if (mActiveSample != nullptr)
+    {
+        if (sliderChanged == &mPitchSlider)
+        {
+            mActiveSample->setPitchShift(mPitchSlider.getValue()); 
+        }
+    }
+}

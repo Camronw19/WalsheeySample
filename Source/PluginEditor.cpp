@@ -63,3 +63,8 @@ void WalsheeySampleAudioProcessorEditor::adsrChanged(ADSRParameters adsrParams)
 {
    audioProcessor.setADSR(adsrParams, mActiveSample->getId()); 
 }
+
+void WalsheeySampleAudioProcessorEditor::pitchShiftChanged(int semitones)
+{
+    audioProcessor.setPitchShift(semitones, mActiveSample->getId()); 
+}
