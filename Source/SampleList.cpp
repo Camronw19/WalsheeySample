@@ -66,11 +66,6 @@ void SampleButton::nameChanged(juce::String)
     updateText();
 }
 
-void SampleButton::fileChanged()
-{
-    repaint();
-}
-
 void SampleButton::isActiveChanged(bool isActive)
 {
     repaint();

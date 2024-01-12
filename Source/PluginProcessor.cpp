@@ -20,7 +20,7 @@ WalsheeySampleAudioProcessor::WalsheeySampleAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ), 
-       playbackPosition()
+       playbackPosition(0)
 #endif
 {
     mSampler.addVoice(new ExtendedSamplerVoice());
@@ -243,10 +243,6 @@ void WalsheeySampleAudioProcessor::setADSR(ADSRParameters adsr, int id)
                 {
                     if (samplerSound->getName() == juce::String(id))
                     {
-                        DBG(adsr.attack);
-                        DBG(adsr.decay);
-                        DBG(adsr.sustain);
-                        DBG(adsr.release);
                         samplerSound->setEnvelopeParameters(juce::ADSR::Parameters(adsr.attack, adsr.decay, adsr.sustain, adsr.release));
                         break;
                     }

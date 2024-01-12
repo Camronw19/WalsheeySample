@@ -35,8 +35,7 @@ public:
 
     void updateText();
 
-    void nameChanged(juce::String) override; 
-    void fileChanged() override; 
+    void nameChanged(juce::String) override;  
     void isActiveChanged(bool) override; 
 
     

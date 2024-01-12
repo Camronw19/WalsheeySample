@@ -61,11 +61,11 @@
       </OUTPUTS>
     </LAYOUT>
   </FILTER>
-  <FILTER uid="16" x="0.5336538461538461" y="0.5425101214574899" useARA="0"
-          uiLastX_Normal="167" uiLastY_Normal="158" uiopen_Normal="0">
+  <FILTER uid="16" x="0.5348557692307693" y="0.5430327868852459" useARA="0"
+          uiLastX_Normal="167" uiLastY_Normal="158" uiopen_Normal="1">
     <PLUGIN name="WalsheeySample" format="VST3" category="Fx" manufacturer="yourcompany"
             version="1.0.0" file="C:\Users\camro\Documents\Development\JUCE Projects\WalsheeySample\Builds\VisualStudio2022\x64\Debug\VST3\WalsheeySample.vst3"
-            uniqueId="f4aba8eb" isInstrument="0" fileTime="18ceef5d526" infoUpdateTime="18ceef8d4f1"
+            uniqueId="f4aba8eb" isInstrument="0" fileTime="18cf9f00d4e" infoUpdateTime="18cf9f03f47"
             numInputs="2" numOutputs="2" isShell="0" hasARAExtension="0"
             uid="e95484f4"/>
     <STATE>191.VMjLgXK....O+fWarAhckI2bo8la8HRLt.iHfTlai8FYo41Y8HRUTYTK3HxO9.BOVMEUy.Ea0cVZtMEcgQWY9vSRC8Vav8lak4Fc9XCLt3hKt3hKt3hKt3hYRUUSTEETIckVwTjQisVTTgkdEYjKAQjYPQSPWgUdMcjKAQjct3hdA4hKt3hKt3hKtnTUv.UQAslXuk0UXoWUFE0YQcEV77RRC8Vav8lak4Fc9vyKVMEUy.Ea0cVZtMEcgQWY9..</STATE>

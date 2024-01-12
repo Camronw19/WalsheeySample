@@ -18,35 +18,31 @@
 */
 
 class PlaybackPositionOverlay : public juce::Component, 
-                                private DataModel::Listener,
-                                private SampleModel::Listener, 
-                                private juce::Timer
-                                
+                                private juce::Timer,
+                                private VisibleRangeDataModel::Listener
 {
 public: 
     using Providor = std::function<float()>; 
-    PlaybackPositionOverlay(const DataModel&, Providor); 
+    PlaybackPositionOverlay(const VisibleRangeDataModel&, Providor);
 
     void paint(juce::Graphics&) override; 
     void timerCallback() override; 
 
-    void activeSampleChanged(SampleModel&) override;
+    virtual void visibleRangeChanged(juce::Range<double>) override; 
 
     double timeToXPosition(); 
 
 private: 
     Providor providor; 
-    DataModel dataModel;
-    std::unique_ptr<SampleModel> activeSample;
+    VisibleRangeDataModel visibleRange; 
 };
 
-
-
 class AudioDisplay : public juce::Component,
-                     public juce::ChangeListener
+                     public juce::ChangeListener, 
+                     private VisibleRangeDataModel::Listener 
 {
 public:
-    AudioDisplay();
+    AudioDisplay(const VisibleRangeDataModel&);
     ~AudioDisplay() override;
 
     void paint(juce::Graphics&) override;
@@ -57,26 +53,22 @@ public:
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     void setThumbnailSource(const juce::File& inputSource);
     void thumbnailChanged();
-    void setVerticalZoom(float vZoom);
-    void setHorizontalZoom(float hZoom);
-    void setHorizontalScroll(float hScroll);
+
     void setShowChannels(bool chan1, bool chan2);
     std::pair<bool, bool> getShowChannels();
+
+    //Visible Range Listener
+    virtual void visibleRangeChanged(juce::Range<double>) override;
 
 private:
     juce::AudioFormatManager mFormatManager;
     juce::AudioThumbnailCache mThumbnailCache;
     juce::AudioThumbnail mThumbnail;
 
-    
+    VisibleRangeDataModel mVisibleRange; 
 
-    double mVerticalZoom;
-    double mHorizontalZoom;
-    double mHorizontalScroll;
     bool mShowChan1;
     bool mShowChan2;
-
-    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioDisplay)
 };

@@ -30,7 +30,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    void fileChanged(SampleModel& sample) override; 
+    void fileChanged(std::shared_ptr<juce::File>) override; 
     void activeSampleChanged(SampleModel&) override;
     virtual void adsrChanged(ADSRParameters) override; 
 

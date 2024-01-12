@@ -99,7 +99,8 @@ void ExtendedSamplerVoice::startNote(int midiNoteNumber, float velocity, juce::S
 
 void ExtendedSamplerVoice::stopNote(float /*velocity*/, bool allowTailOff)
 {
-    isNotePlaying = false;
+    isNotePlaying = false; 
+
     if (allowTailOff)
     {
         adsr.noteOff();
@@ -109,8 +110,6 @@ void ExtendedSamplerVoice::stopNote(float /*velocity*/, bool allowTailOff)
         clearCurrentNote();
         adsr.reset();
     }
-
-    sourceSamplePosition = 0.0;
 }
 
 void ExtendedSamplerVoice::pitchWheelMoved(int /*newValue*/) {}
@@ -119,7 +118,7 @@ void ExtendedSamplerVoice::controllerMoved(int /*controllerNumber*/, int /*newVa
 //==============================================================================
 void ExtendedSamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
 {
-    if (!isNotePlaying) return;
+
     if (auto* playingSound = static_cast<ExtendedSamplerSound*> (getCurrentlyPlayingSound().get()))
     {
         auto& data = *playingSound->data;
@@ -137,8 +136,7 @@ void ExtendedSamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffe
 
             // just using a very simple linear interpolation here..
             float l = (inL[pos] * invAlpha + inL[pos + 1] * alpha);
-            float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
-                : l;
+            float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha) : l;
 
             auto envelopeValue = adsr.getNextSample();
 
@@ -168,7 +166,10 @@ void ExtendedSamplerVoice::renderNextBlock(juce::AudioBuffer<float>& outputBuffe
 
 double ExtendedSamplerVoice::getSourceSamplePosition()
 {
-    return sourceSamplePosition; 
+    if (isNotePlaying)
+        return sourceSamplePosition;
+    else
+        return 0; 
 }
 
 double ExtendedSamplerVoice::getSouceSampleRate()

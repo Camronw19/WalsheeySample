@@ -28,6 +28,8 @@ namespace IDs
     DECLARE_ID(midiNote)
     DECLARE_ID(adsr)
     DECLARE_ID(totalRange)
+
+    DECLARE_ID(VISIBLE_RANGE)
     DECLARE_ID(visibleRange)
 
 #undef DECLARE_ID
@@ -155,6 +157,83 @@ private:
     juce::ValueTree state; 
 };
 
+class VisibleRangeDataModel : public Model
+{
+public: 
+    class Listener
+    {
+    public:
+        virtual ~Listener() noexcept = default;
+        virtual void visibleRangeChanged(juce::Range<double>) {}
+    };
+    
+    explicit VisibleRangeDataModel()
+        : VisibleRangeDataModel(juce::ValueTree(IDs::VISIBLE_RANGE)) {}
+
+    VisibleRangeDataModel(const juce::ValueTree& vt)
+        : Model(vt), 
+          totalRange(getState(), IDs::totalRange, nullptr),
+          visibleRange(getState(), IDs::visibleRange, nullptr) 
+    {
+        jassert(getState().hasType(IDs::VISIBLE_RANGE));
+        setTotalRange(juce::Range<double>(0, 0)); 
+    }
+
+    VisibleRangeDataModel(const VisibleRangeDataModel& other)
+        :VisibleRangeDataModel(other.getState()) {}
+
+    //============Accessor Methods============
+    void setVisibleRange(const juce::Range<double> newRange)
+    {
+        visibleRange.setValue(newRange, nullptr); 
+    }
+
+    juce::Range<double> getVisibleRange()
+    {
+        return visibleRange; 
+    }
+
+    void setTotalRange(const juce::Range<double> newRange)
+    {
+        totalRange.setValue(newRange, nullptr);
+        visibleRange.setValue(newRange, nullptr); 
+    }
+
+    juce::Range<double> getTotalRange()
+    {
+        return totalRange;
+    }
+
+    //============Listener Methods============
+    void addListener(Listener& listener)
+    {
+        listenerList.add(&listener);
+    }
+
+    void removeListener(Listener& listener)
+    {
+        listenerList.remove(&listener);
+    }
+
+private: 
+    void valueTreePropertyChanged(juce::ValueTree& treeChanged, const juce::Identifier& property)
+    {
+        if (treeChanged == getState())
+        {
+            if (property == IDs::visibleRange)
+            {
+                visibleRange.forceUpdateOfCachedValue();
+                listenerList.call([&](Listener& l) { l.visibleRangeChanged(visibleRange); });
+                return;
+            }
+        }
+    }
+
+    juce::CachedValue<juce::Range<double>> totalRange;
+    juce::CachedValue<juce::Range<double>> visibleRange;
+    juce::ListenerList<Listener> listenerList;
+};
+
 class SampleModel : public Model
 {
 public:
@@ -163,11 +242,10 @@ public:
     public:
         virtual ~Listener() noexcept = default;
         virtual void nameChanged(juce::String) {}
-        virtual void fileChanged() {}
+        virtual void fileChanged(std::shared_ptr<juce::File>) {}
         virtual void isActiveChanged(bool) {}
         virtual void midiNoteChanged(int) {}
         virtual void adsrChanged(ADSRParameters) {}
-        virtual void visibleRangeChanged(juce::Range<double>) {}
     };
 
      explicit SampleModel()
@@ -181,8 +259,7 @@ public:
         midiNote(getState(), IDs::midiNote, nullptr),
         adsr(getState(), IDs::adsr, nullptr),
         isActiveSample(getState(), IDs::isActive, nullptr),
-        totalRange(getState(), IDs::totalRange, nullptr), 
-        visibleRange(getState(), IDs::visibleRange, nullptr)
+        totalRange(getState(), IDs::totalRange, nullptr)
     {
         jassert(getState().hasType(IDs::SAMPLE));
         formatManager.registerBasicFormats(); 
@@ -203,7 +280,6 @@ public:
         std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(file)); 
         
         setTotalRange(juce::Range<double>(0, static_cast<double>(reader->lengthInSamples / reader->sampleRate)));
-        setVisibleRange(juce::Range<double>(0, static_cast<double>(reader->lengthInSamples / reader->sampleRate)));
     }
 
     void setIsActive(const bool active) 
@@ -255,11 +331,6 @@ public:
         totalRange.setValue(range, nullptr); 
     }
 
-    void setVisibleRange(const juce::Range<double> range)
-    {
-        visibleRange.setValue(totalRange.get().constrainRange(range), nullptr); 
-    }
-
     //============ Getter Methods ============
     juce::String getName() const 
     {
@@ -296,9 +367,12 @@ public:
         return totalRange; 
     }
 
-    juce::Range<double> getVisibleRange()
+    bool sampleExists()
     {
-        return visibleRange; 
+        if (audioFile.get())
+            return true;
+        else
+            return false; 
     }
 
     //============Listener Methods============
@@ -326,7 +400,7 @@ private:
             else if (property == IDs::file)
             {
                 audioFile.forceUpdateOfCachedValue();
-                listenerList.call([&](Listener& l) { l.fileChanged(); });
+                listenerList.call([&](Listener& l) { l.fileChanged(audioFile); });
                 return;
             }
             else if(property == IDs::isActive)
@@ -346,11 +420,6 @@ private:
                 adsr.forceUpdateOfCachedValue(); 
                 listenerList.call([&](Listener& l) { l.adsrChanged(adsr); });
             }
-            else if (property == IDs::visibleRange)
-            {
-                visibleRange.forceUpdateOfCachedValue(); 
-                listenerList.call([&](Listener& l) { l.visibleRangeChanged(visibleRange); });
-            }
         }
     }
 
@@ -361,7 +430,6 @@ private:
     juce::CachedValue<ADSRParameters> adsr; 
     juce::CachedValue<bool> isActiveSample; 
     juce::CachedValue<juce::Range<double>> totalRange;
-    juce::CachedValue<juce::Range<double>> visibleRange;
 
     juce::ListenerList<Listener> listenerList;
     juce::AudioFormatManager formatManager; 
@@ -375,8 +443,6 @@ public:
     {
     public:
         virtual ~Listener() noexcept = default;
-        virtual void nameChanged(SampleModel&) {}
-        virtual void fileChanged(SampleModel&) {}
         virtual void activeSampleChanged(SampleModel&) {}
     };
 
@@ -406,7 +472,6 @@ public:
             sampleModel.setId(i);
             sampleModel.setMidiNote(36 + i);
             sampleModel.setTotalRange(juce::Range<double>(0, 0));
-            sampleModel.setVisibleRange(juce::Range<double>(0, 0));
 
             sampleModel.getState().addListener(this);
             getState().addChild(sampleModel.getState(), -1, nullptr);
@@ -430,15 +495,7 @@ private:
     {
         if (treeChanged.hasType(IDs::SAMPLE))
         {
-            if (property == IDs::name)
-            {
-                listenerList.call([&](Listener& l) { l.nameChanged(SampleModel(treeChanged)); });
-            }
-            else if (property == IDs::file) 
-            {
-                listenerList.call([&](Listener& l) { l.fileChanged(SampleModel(treeChanged)); });
-            }
-            else if (property == IDs::isActive && treeChanged != activeSample && static_cast<bool>((treeChanged[IDs::isActive])) == true)
+            if (property == IDs::isActive && treeChanged != activeSample && static_cast<bool>((treeChanged[IDs::isActive])) == true)
             {
                 if (activeSample.isValid())
                     activeSample.setProperty(IDs::isActive, false, nullptr); 

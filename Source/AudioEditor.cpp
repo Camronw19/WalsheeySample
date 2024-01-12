@@ -14,7 +14,7 @@
 
 //==============================================================================
 AudioEditor::AudioEditor(const DataModel& dm, PlaybackPositionOverlay::Providor providor)
-    :dataModel(dm), mPlaybackOverlay(dm, std::move(providor))
+    :dataModel(dm),  mPlaybackOverlay(visibleRange, std::move(providor)), mAudioDisplay(visibleRange)
 {
     dataModel.addListener(*this); 
 
@@ -107,22 +107,54 @@ void AudioEditor::sliderValueChanged(juce::Slider* slider)
     {
         float sliderValue = static_cast<float>(mVerticalZoom.getValue());
         float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mVerticalZoom.getMaximum()), static_cast<float>(mVerticalZoom.getMinimum()), 1.0f, 0.1f);
-        mAudioDisplay.setVerticalZoom(normalizedSliderValue);
     }
     else if (slider == &mHorizontalZoom)
     {
-        float sliderValue = static_cast<float>(mHorizontalZoom.getValue());
-        float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mHorizontalZoom.getMaximum()), static_cast<float>(mHorizontalZoom.getMinimum()), .97f, 0.0f);
-        mAudioDisplay.setHorizontalZoom(normalizedSliderValue);
+        updateZoomRange(); 
+        updateScrollRange(); 
     }
     else if (slider == &mHorizontalScroll)
     {
-        float sliderValue = static_cast<float>(mHorizontalScroll.getValue());
-        float normalizedSliderValue = juce::jmap(sliderValue, static_cast<float>(mHorizontalScroll.getMaximum()), static_cast<float>(mHorizontalScroll.getMinimum()), 1.0f, 0.0f);
-        mAudioDisplay.setHorizontalScroll(normalizedSliderValue);
-        DBG(normalizedSliderValue);
+        updateScrollRange();
     }
 }
+
+void AudioEditor::updateScrollRange()
+{
+    float sliderValue = static_cast<float>(mHorizontalScroll.getValue());
+    float normalizedScrollValue = juce::jmap(sliderValue, static_cast<float>(mHorizontalScroll.getMaximum()), static_cast<float>(mHorizontalScroll.getMinimum()), 1.0f, 0.0f);
+
+    auto totalRange = visibleRange.getTotalRange();
+    auto currentVisibleRange = visibleRange.getVisibleRange();
+    double visibleLength = currentVisibleRange.getLength();
+    double maxStart = totalRange.getEnd() - visibleLength;
+    double start = normalizedScrollValue * maxStart;
+    double end = start + visibleLength;
+
+    visibleRange.setVisibleRange(juce::Range<double>(start, end));
+}
+
+void AudioEditor::updateZoomRange()
+{
+    float sliderValue = static_cast<float>(mHorizontalZoom.getValue());
+    float normalizedZoomValue = juce::jmap(sliderValue, static_cast<float>(mHorizontalZoom.getMaximum()), static_cast<float>(mHorizontalZoom.getMinimum()), .97f, 0.0f);
+
+    auto totalRange = visibleRange.getTotalRange();
+    auto currentVisibleRange = visibleRange.getVisibleRange();
+    double visibleLength = totalRange.getLength() * (1 - normalizedZoomValue);
+    double start = currentVisibleRange.getStart();
+    double end = start + visibleLength;
+
+    // Ensure the new end does not exceed the total range
+    if (end > totalRange.getEnd())
+    {
+        end = totalRange.getEnd();
+        start = end - visibleLength;
+    }
+
+    visibleRange.setVisibleRange(juce::Range<double>(start, end));
+}
+
 
 void AudioEditor::buttonClicked(juce::Button* button)
 {
@@ -131,28 +163,40 @@ void AudioEditor::buttonClicked(juce::Button* button)
 
 void AudioEditor::activeSampleChanged(SampleModel& modelChanged)
 {
-    updateWaveform(modelChanged);
+    updateWaveform(modelChanged.getAudioFile());
     updateNameLabel(modelChanged.getName());
+    updateVisibleRange(modelChanged.getTotalRange()); 
+
+    if (activeSample != nullptr)
+        activeSample->removeListener(*this);
+
+    activeSample = std::make_unique<SampleModel>(modelChanged.getState());
+
+    if (activeSample != nullptr)
+        activeSample->addListener(*this);
 }
 
-void AudioEditor::fileChanged(SampleModel& modelChanged)
+void AudioEditor::fileChanged(std::shared_ptr<juce::File> file)
 {
-    updateWaveform(modelChanged); 
-    updateNameLabel(modelChanged.getName());
+    updateWaveform(file); 
 }
 
-void AudioEditor::nameChanged(SampleModel& modelChanged)
+void AudioEditor::nameChanged(juce::String name)
 {
-    updateNameLabel(modelChanged.getName());
+    updateNameLabel(name);
 }
 
-void AudioEditor::updateWaveform(SampleModel& modelChanged)
+void AudioEditor::updateWaveform(const std::shared_ptr<juce::File>& file)
 {
-    auto file = modelChanged.getAudioFile();
     if (file != nullptr)
         setThumbnailSource(*file);
     else
         setThumbnailSource(juce::File()); 
+}
+
+void AudioEditor::updateVisibleRange(const juce::Range<double>& newRange)
+{
+    visibleRange.setTotalRange(newRange); 
 }
 
 void AudioEditor::updateNameLabel(juce::String name)
