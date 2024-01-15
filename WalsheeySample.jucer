@@ -35,6 +35,8 @@
       <FILE id="JkvVUL" name="UIConfig.h" compile="0" resource="0" file="Source/UIConfig.h"/>
       <FILE id="d1B1nd" name="ValueTreeObjectList.h" compile="0" resource="0"
             file="Source/ValueTreeObjectList.h"/>
+      <FILE id="Z96jDE" name="ADSRDisplay.cpp" compile="1" resource="0" file="Source/ADSRDisplay.cpp"/>
+      <FILE id="T67uaf" name="ADSRDisplay.h" compile="0" resource="0" file="Source/ADSRDisplay.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

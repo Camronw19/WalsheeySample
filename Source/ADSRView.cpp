@@ -14,9 +14,11 @@
 
 //==============================================================================
 ADSRView::ADSRView(const DataModel& dm)
-    :mDataModel(dm)
+    :mDataModel(dm),mADSRDisplay(dm)
 {
     mDataModel.addListener(*this); 
+
+    addAndMakeVisible(mADSRDisplay);
 
     // Initialize sliders 
     for (auto& slider : getSliders())
@@ -37,16 +39,26 @@ ADSRView::ADSRView(const DataModel& dm)
     // Initialize labels
     for (auto& label : getLabels())
     {
-        label->setJustificationType(juce::Justification::centred);
         label->setColour(juce::Label::textColourId, AppColors::backgroundColour);
+        label->setJustificationType(juce::Justification::centred);
         addAndMakeVisible(label); 
     }
 
-    mSampleLabel.setJustificationType(juce::Justification::left); 
+
+    mSampleLabel.setJustificationType(juce::Justification::centredBottom); 
+
+
     mAttackLabel.setText("Attack", juce::dontSendNotification);
+   // mAttackLabel.attachToComponent(&mAttackSlider, false);
+
     mDecayLabel.setText("Decay", juce::dontSendNotification);
+   // mDecayLabel.attachToComponent(&mDecaySlider, false);
+
     mSustainLabel.setText("Sustain", juce::dontSendNotification);
+   // mSustainLabel.attachToComponent(&mSustainSlider, false);
+
     mReleaseLabel.setText("Release", juce::dontSendNotification); 
+   // mReleaseLabel.attachToComponent(&mReleaseSlider, false);
 }
 
 ADSRView::~ADSRView()
@@ -56,24 +68,28 @@ ADSRView::~ADSRView()
 void ADSRView::paint (juce::Graphics& g)
 {
     g.fillAll(AppColors::mainWindowColour);
+    float linePositionY = getLocalBounds().getHeight() * 0.75;
+    g.drawLine(getLocalBounds().getX(), linePositionY, getLocalBounds().getRight(), linePositionY);
 }
 
 void ADSRView::resized()
 {
-    auto bounds = getLocalBounds(); 
-    auto labelBounds = bounds.removeFromBottom(20); 
-    mSampleLabel.setBounds(bounds.removeFromTop(20));
+    auto audioDisplayBounds = getADSRWindowBounds();
+    mADSRDisplay.setBounds(audioDisplayBounds);
 
-    auto width = getWidth() / 4;
+    //Slider Layout
+    juce::FlexBox sliderFlexBox;
+    sliderFlexBox.items.add(juce::FlexItem(mAttackSlider).withFlex(1.0, 1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mDecaySlider).withFlex(1.0, 1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mSustainSlider).withFlex(1.0, 1.0));
+    sliderFlexBox.items.add(juce::FlexItem(mReleaseSlider).withFlex(1.0, 1.0));
+    //sliderFlexBox.items.add(juce::FlexItem(mSampleLabel).withFlex(1.0, 1.0));
 
-    for (auto& label : getLabels())
-    {
-        if(label != &mSampleLabel)
-            label->setBounds(labelBounds.removeFromLeft(width));
-    }
-   
-    for (auto& slider : getSliders())
-        slider->setBounds(bounds.removeFromLeft(width)); 
+    sliderFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
+    sliderFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    sliderFlexBox.alignContent = juce::FlexBox::AlignContent::center;
+
+    sliderFlexBox.performLayout(getSliderWindowBounds());
 }
 
 void ADSRView::sliderValueChanged(juce::Slider* slider)
@@ -133,6 +149,25 @@ std::vector<juce::Slider*> ADSRView::getSliders()
 std::vector<juce::Label*> ADSRView::getLabels()
 {
     return { &mSampleLabel, &mAttackLabel, &mDecayLabel, &mSustainLabel, &mReleaseLabel };
+}
+
+juce::Rectangle<int> ADSRView::getADSRWindowBounds()
+{
+    auto bounds = getLocalBounds();
+    juce::Rectangle<int> waveformBounds(bounds.getTopLeft().getX(), bounds.getTopLeft().getY(), bounds.getWidth(), bounds.getHeight() * .75);
+    waveformBounds = waveformBounds.reduced(10);
+
+    return waveformBounds;
+}
+
+juce::Rectangle<int> ADSRView::getSliderWindowBounds()
+{
+    auto bounds = getLocalBounds();
+    int sliderWindowHeight = bounds.getHeight() / 4;
+    juce::Rectangle<int> sliderWindowBounds(bounds.getX(), bounds.getBottom() - sliderWindowHeight, bounds.getWidth(), sliderWindowHeight);
+
+    //sliderWindowBounds = sliderWindowBounds.reduced(20);
+    return sliderWindowBounds;
 }
 
 

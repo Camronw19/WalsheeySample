@@ -14,6 +14,7 @@
 #include <vector>
 #include "Model.h"
 #include "UIConfig.h"
+#include "ADSRDisplay.h"
 //==============================================================================
 /*
 */
@@ -39,12 +40,18 @@ private:
     // Slider listener 
     void sliderValueChanged(juce::Slider*) override;
 
+    juce::Rectangle<int> getADSRWindowBounds();
+    juce::Rectangle<int> getSliderWindowBounds();
+
+    
+
     // Helper methods
     std::vector<juce::Slider*> getSliders();
     std::vector<juce::Label*> getLabels();
 
     juce::Slider mAttackSlider, mDecaySlider, mSustainSlider, mReleaseSlider; 
     juce::Label mSampleLabel, mAttackLabel, mDecayLabel, mSustainLabel, mReleaseLabel; 
+    ADSRDisplay mADSRDisplay;
     
     DataModel mDataModel;
     std::unique_ptr<SampleModel> mActiveSample; 
