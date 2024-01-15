@@ -31,6 +31,8 @@ public:
 private:
     DataModel mDataModel; 
 
+    juce::TabbedComponent mTabView;
+
     SampleList mSampleButtons; 
     AudioEditor mAudioEditor; 
     ADSRView mADSRView; 

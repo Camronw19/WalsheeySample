@@ -16,14 +16,18 @@ MainSamplerView::MainSamplerView(const DataModel& dataModel, PlaybackPositionOve
     mSampleButtons(dataModel.getState()), 
     mAudioEditor(dataModel, std::move(providor)), 
     mADSRView(dataModel), 
-    mPitchView(dataModel)
+    mPitchView(dataModel), 
+    mTabView(juce::TabbedButtonBar::Orientation::TabsAtTop)
 {
-    mDataModel.addListener(*this); 
+    mDataModel.addListener(*this);
+
+    mTabView.addTab("Editor", AppColors::mainWindowColour, &mAudioEditor, false);
+    mTabView.addTab("ADSR", AppColors::mainWindowColour, &mADSRView, false);
+    mTabView.addTab("Pitch", AppColors::mainWindowColour, &mPitchView, false);
+    mTabView.setCurrentTabIndex(0); 
 
     addAndMakeVisible(mSampleButtons); 
-    addAndMakeVisible(mAudioEditor);
-    addAndMakeVisible(mADSRView); 
-    addAndMakeVisible(mPitchView); 
+    addAndMakeVisible(mTabView);
 }
 
 MainSamplerView::~MainSamplerView()
@@ -40,10 +44,7 @@ void MainSamplerView::paint(juce::Graphics& g)
 void MainSamplerView::resized()
 {
     auto bounds = getLocalBounds();
-    auto height = getHeight() / 4;
-
-    mAudioEditor.setBounds(bounds.removeFromTop(height));
-    mADSRView.setBounds(bounds.removeFromTop(height));
-    mSampleButtons.setBounds(bounds.removeFromTop(height));
-    mPitchView.setBounds(bounds.removeFromTop(height)); 
+    
+    mSampleButtons.setBounds(bounds.removeFromBottom(150)); 
+    mTabView.setBounds(bounds); 
 }

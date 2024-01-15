@@ -32,8 +32,7 @@ AudioEditor::~AudioEditor()
 void AudioEditor::paint(juce::Graphics& g)
 {
     g.setColour(AppColors::backgroundColour);
-    g.drawRect(getLocalBounds().toFloat());
-  
+ 
     float linePositionY = getLocalBounds().getHeight() * 0.75;
     g.drawLine(getLocalBounds().getX(), linePositionY, getLocalBounds().getRight(), linePositionY);
 }

@@ -20,9 +20,9 @@ WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (Walsheey
 
     addAndMakeVisible(mMainSamplerView); 
 
-    setResizable(true, true); 
-    setResizeLimits(400, 300, 1200, 900); 
-    setSize (800, 600);
+    //setResizable(true, true); 
+    //setResizeLimits(400, 300, 1200, 900); 
+    setSize (800, 500);
 }
 
 WalsheeySampleAudioProcessorEditor::~WalsheeySampleAudioProcessorEditor()
