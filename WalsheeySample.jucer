@@ -29,6 +29,8 @@
       <FILE id="uJkFiv" name="AudioEditor.cpp" compile="1" resource="0" file="Source/AudioEditor.cpp"/>
       <FILE id="vnuReK" name="AudioEditor.h" compile="0" resource="0" file="Source/AudioEditor.h"/>
       <FILE id="EX3Omr" name="ADSRView.cpp" compile="1" resource="0" file="Source/ADSRView.cpp"/>
+      <FILE id="XIMWSy" name="SVGSlider.cpp" compile="1" resource="0" file="Source/SVGSlider.cpp"/>
+      <FILE id="B2CaYA" name="SVGSlider.h" compile="0" resource="0" file="Source/SVGSlider.h"/>
       <FILE id="TD84eJ" name="ADSRView.h" compile="0" resource="0" file="Source/ADSRView.h"/>
       <FILE id="JkvVUL" name="UIConfig.h" compile="0" resource="0" file="Source/UIConfig.h"/>
       <FILE id="d1B1nd" name="ValueTreeObjectList.h" compile="0" resource="0"
@@ -39,7 +41,7 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="WalsheeySample"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="WalsheeySample" postbuildCommand="xcopy /E /I /Y &quot;..\..\Assets&quot; &quot;$(ProjectDir)\x64\Debug\VST3\Assets&quot;&#10;"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="WalsheeySample"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
