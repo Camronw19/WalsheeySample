@@ -31,8 +31,10 @@ AudioEditor::~AudioEditor()
 
 void AudioEditor::paint(juce::Graphics& g)
 {
-    g.setColour(AppColors::backgroundColour);
- 
+    g.setColour(AppColors::silderWindowColour);
+    g.fillRect(getSliderWindowBounds());
+  
+    g.setColour(AppColors::silderWindowAccentColour);
     float linePositionY = getLocalBounds().getHeight() * 0.75;
     g.drawLine(getLocalBounds().getX(), linePositionY, getLocalBounds().getRight(), linePositionY);
 }
@@ -51,6 +53,12 @@ void AudioEditor::resized()
     sliderFlexBox.items.add(juce::FlexItem(mActiveSampleName).withFlex(1.0, 1.0));
     sliderFlexBox.items.add(juce::FlexItem(mHorizontalZoom).withFlex(1.0, 1.0));
     sliderFlexBox.items.add(juce::FlexItem(mChannelSelect).withFlex(1.0, 1.0));
+
+    mChannelSelect.setColour(juce::ComboBox::ColourIds::backgroundColourId, AppColors::silderWindowColour);
+    mChannelSelect.setColour(juce::ComboBox::ColourIds::outlineColourId, AppColors::silderWindowAccentColour);
+    mChannelSelect.setColour(juce::ComboBox::ColourIds::focusedOutlineColourId, AppColors::silderWindowAccentColour);
+    mChannelSelect.setColour(juce::ComboBox::ColourIds::textColourId, AppColors::labelColour);
+
 
     sliderFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
     sliderFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
@@ -211,8 +219,8 @@ juce::Rectangle<int> AudioEditor::getSliderWindowBounds()
 void AudioEditor::initializeComponents()
 {
     mActiveSampleName.setJustificationType(juce::Justification::centred);
-    mActiveSampleName.setColour(juce::Label::textColourId, AppColors::backgroundColour);
-    mActiveSampleName.setColour(juce::Label::outlineColourId, AppColors::backgroundColour);
+    mActiveSampleName.setColour(juce::Label::textColourId, AppColors::componentbackgroundColour);
+    
 
     //Zoom sliders
     mVerticalZoom.addListener(this);

@@ -74,7 +74,7 @@ void AudioDisplay::paint(juce::Graphics& g)
 
 void AudioDisplay::paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(AppColors::backgroundColour);
+    g.setColour(AppColors::componentbackgroundColour);
     g.fillRect(thumbnailBounds);
 
     g.setColour(AppColors::accentColour);
@@ -83,7 +83,7 @@ void AudioDisplay::paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& 
 
 void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(AppColors::backgroundColour);
+    g.setColour(AppColors::componentbackgroundColour);
     g.fillRect(thumbnailBounds);
 
     auto startTime = mVisibleRange.getVisibleRange().getStart();

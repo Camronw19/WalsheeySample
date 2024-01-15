@@ -29,7 +29,7 @@ SampleButton::~SampleButton()
 void SampleButton::paint(juce::Graphics& g)
 {
 
-    g.setColour(AppColors::backgroundColour);
+    g.setColour(AppColors::componentbackgroundColour);
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
 
     g.setColour(juce::Colours::grey);
@@ -127,8 +127,7 @@ SampleList::~SampleList()
 
 void SampleList::paint (juce::Graphics& g)
 {
-    g.setColour(juce::Colour::fromRGB(11, 12, 14));
-    g.drawRect(getLocalBounds().toFloat()); 
+   
 }
 
 void SampleList::resized()

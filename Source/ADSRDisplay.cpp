@@ -26,7 +26,7 @@ ADSRDisplay::~ADSRDisplay()
 
 void ADSRDisplay::paint (juce::Graphics& g)
 {
-    g.fillAll(AppColors::backgroundColour);
+    g.fillAll(AppColors::componentbackgroundColour);
 
     if (mActiveSample != nullptr) 
     {
@@ -91,7 +91,10 @@ void ADSRDisplay::activeSampleChanged(SampleModel& sm)
     mActiveSample = std::make_unique<SampleModel>(sm.getState());
 
     if (mActiveSample != nullptr)
+    {
         mActiveSample->addListener(*this);
+        updateADSRPoints(mActiveSample.get()->getADSR());
+    }
 }
 
 void ADSRDisplay::adsrChanged(ADSRParameters params)

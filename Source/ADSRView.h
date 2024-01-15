@@ -84,7 +84,8 @@ private:
 
 
     juce::Slider mPitchSlider;
-    juce::Label mPitchLabel;
+    
+juce::Label mPitchLabel;
 
     DataModel mDataModel;
     std::unique_ptr<SampleModel> mActiveSample;

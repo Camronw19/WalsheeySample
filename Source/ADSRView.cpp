@@ -25,7 +25,7 @@ ADSRView::ADSRView(const DataModel& dm)
     {
         slider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0); 
         slider->setSliderStyle(juce::Slider::RotaryVerticalDrag); 
-        slider->setColour(juce::Slider::textBoxTextColourId, AppColors::backgroundColour);
+        slider->setColour(juce::Slider::textBoxTextColourId, AppColors::componentbackgroundColour);
         slider->setColour(juce::Slider::thumbColourId, AppColors::accentColour);
         slider->addListener(this); 
         addAndMakeVisible(slider); 
@@ -39,7 +39,7 @@ ADSRView::ADSRView(const DataModel& dm)
     // Initialize labels
     for (auto& label : getLabels())
     {
-        label->setColour(juce::Label::textColourId, AppColors::backgroundColour);
+        label->setColour(juce::Label::textColourId, AppColors::componentbackgroundColour);
         label->setJustificationType(juce::Justification::centred);
         addAndMakeVisible(label); 
     }
@@ -68,7 +68,12 @@ ADSRView::~ADSRView()
 void ADSRView::paint (juce::Graphics& g)
 {
     g.fillAll(AppColors::mainWindowColour);
+    g.setColour(AppColors::silderWindowColour);
+
+    g.fillRect(getSliderWindowBounds());
     float linePositionY = getLocalBounds().getHeight() * 0.75;
+
+    g.setColour(AppColors::silderWindowAccentColour);
     g.drawLine(getLocalBounds().getX(), linePositionY, getLocalBounds().getRight(), linePositionY);
 }
 
@@ -180,12 +185,12 @@ PitchView::PitchView(const DataModel& dm)
 
     mPitchLabel.setText("Pitch Shift", juce::dontSendNotification); 
     mPitchLabel.setJustificationType(juce::Justification::centred);
-    mPitchLabel.setColour(juce::Label::textColourId, AppColors::backgroundColour);
+    mPitchLabel.setColour(juce::Label::textColourId, AppColors::componentbackgroundColour);
     addAndMakeVisible(mPitchLabel);
 
     mPitchSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
     mPitchSlider.setSliderStyle(juce::Slider::RotaryVerticalDrag);
-    mPitchSlider.setColour(juce::Slider::textBoxTextColourId, AppColors::backgroundColour);
+    mPitchSlider.setColour(juce::Slider::textBoxTextColourId, AppColors::componentbackgroundColour);
     mPitchSlider.setColour(juce::Slider::thumbColourId, AppColors::accentColour);
     mPitchSlider.setRange(juce::Range<double>(-12, 12), 1); 
     mPitchSlider.addListener(this);
