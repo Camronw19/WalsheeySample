@@ -26,9 +26,9 @@ void PlaybackPositionOverlay::paint(juce::Graphics& g)
         g.setColour(juce::Colours::red);
         auto playbackInfo = mProvidor(); 
 
-        if (mActiveSample->getMidiNote() == playbackInfo.second)
+        if (mActiveSample->getMidiNote() == playbackInfo.midiNote)
         {
-            auto xPos = timeToXPosition(playbackInfo.first); 
+            auto xPos = timeToXPosition(playbackInfo.playbackPosition); 
 
             juce::Path playhead; 
             playhead.addTriangle(juce::Point<float>(xPos - 10, 0), juce::Point<float>(xPos + 10, 0), juce::Point<float>(xPos, 10));

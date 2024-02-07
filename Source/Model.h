@@ -538,6 +538,12 @@ private:
 };
 
 
+struct PlaybackData
+{
+    float playbackPosition; 
+    float midiNote; 
+};
+
 //void  initializeDefaultModel(DataModel& dataModel, int numSamples)
 //{
 //    jassert(dataModel.getState().hasType(IDs::DATA_MODEL));

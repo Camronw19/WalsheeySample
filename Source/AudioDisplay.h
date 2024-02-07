@@ -22,7 +22,7 @@ class PlaybackPositionOverlay : public juce::Component,
                                 private DataModel::Listener
 {
 public: 
-    using Providor = std::function<std::pair<float, float>()>;
+    using Providor = std::function<PlaybackData()>;
     PlaybackPositionOverlay(const DataModel&, const VisibleRangeDataModel&, Providor);
 
     void paint(juce::Graphics&) override; 

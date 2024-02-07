@@ -67,7 +67,7 @@ public:
     void setPitchShift(int, int); 
 
 
-    std::pair<float, float> getPlaybackPosition() { return { playbackPosition.get(), mCurrentMidiNode.get() }; }
+    PlaybackData getPlaybackPosition() { return { playbackPosition.get(), mCurrentMidiNode.get() }; }
 
 private:
     juce::Synthesiser mSampler; 
