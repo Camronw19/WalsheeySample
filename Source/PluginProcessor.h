@@ -66,7 +66,8 @@ public:
     void setADSR(ADSRParameters, int); 
     void setPitchShift(int, int); 
 
-    float getPlaybackPosition() { return playbackPosition.get(); }
+
+    std::pair<float, float> getPlaybackPosition() { return { playbackPosition.get(), mCurrentMidiNode.get() }; }
 
 private:
     juce::Synthesiser mSampler; 
@@ -74,6 +75,7 @@ private:
     juce::SpinLock mCommandQueueMutex;
 
     juce::Atomic<float> playbackPosition; 
+    juce::Atomic<float> mCurrentMidiNode; 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WalsheeySampleAudioProcessor)
 };

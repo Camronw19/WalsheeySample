@@ -18,20 +18,27 @@
 */
 
 class PlaybackPositionOverlay : public juce::Component, 
-                                private juce::Timer
+                                private juce::Timer, 
+                                private DataModel::Listener
 {
 public: 
-    using Providor = std::function<float()>; 
-    PlaybackPositionOverlay(const VisibleRangeDataModel&, Providor);
+    using Providor = std::function<std::pair<float, float>()>;
+    PlaybackPositionOverlay(const DataModel&, const VisibleRangeDataModel&, Providor);
 
     void paint(juce::Graphics&) override; 
 
 private: 
     void timerCallback() override; 
-    double timeToXPosition(); 
+    double timeToXPosition(double playbackPos);
+
+    //Data Model Listener
+    void activeSampleChanged(SampleModel&) override;
 
     Providor mProvidor; 
     VisibleRangeDataModel mVisibleRange; 
+    DataModel mDataModel;
+
+    std::unique_ptr<SampleModel> mActiveSample;
 };
 
 class AudioDisplay : public juce::Component,

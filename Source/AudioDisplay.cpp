@@ -12,9 +12,10 @@
 #include "AudioDisplay.h"
 
 
-PlaybackPositionOverlay::PlaybackPositionOverlay(const VisibleRangeDataModel& vrdm, Providor providorIn)
-    :mProvidor(std::move(providorIn)), mVisibleRange(vrdm)
+PlaybackPositionOverlay::PlaybackPositionOverlay(const DataModel& dm, const VisibleRangeDataModel& vrdm, Providor providorIn)
+    :mDataModel(dm), mProvidor(std::move(providorIn)), mVisibleRange(vrdm)
 {
+    mDataModel.addListener(*this);
     startTimer(16);
 }
 
@@ -23,13 +24,18 @@ void PlaybackPositionOverlay::paint(juce::Graphics& g)
     if (mVisibleRange.getTotalRange().getLength() > 0)
     {
         g.setColour(juce::Colours::red);
-        auto xPos = timeToXPosition();
-        juce::Path playhead;
+        auto playbackInfo = mProvidor(); 
 
-        playhead.addTriangle(juce::Point<float>(xPos - 10, 0), juce::Point<float>(xPos + 10, 0), juce::Point<float>(xPos, 10));
+        if (mActiveSample->getMidiNote() == playbackInfo.second)
+        {
+            auto xPos = timeToXPosition(playbackInfo.first); 
 
-        g.fillPath(playhead);
-        g.drawVerticalLine(timeToXPosition(), 0, static_cast<float>(getHeight()));
+            juce::Path playhead; 
+            playhead.addTriangle(juce::Point<float>(xPos - 10, 0), juce::Point<float>(xPos + 10, 0), juce::Point<float>(xPos, 10));
+
+            g.fillPath(playhead);
+            g.drawVerticalLine(xPos, 0, static_cast<float>(getHeight()));
+        }
     }
 }
 
@@ -38,13 +44,17 @@ void PlaybackPositionOverlay::timerCallback()
     repaint(); 
 }
 
-double PlaybackPositionOverlay::timeToXPosition()
+double PlaybackPositionOverlay::timeToXPosition(double playbackPos)
 {
-    auto time = mProvidor();
     auto range = mVisibleRange.getVisibleRange();
 
-    return (time - range.getStart()) * getWidth()
+    return (playbackPos - range.getStart()) * getWidth()
         / range.getLength();
+}
+
+void PlaybackPositionOverlay::activeSampleChanged(SampleModel& modelChanged)
+{
+    mActiveSample = std::make_unique<SampleModel>(modelChanged.getState());
 }
 
 //==============================================================================

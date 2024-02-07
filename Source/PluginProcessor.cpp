@@ -296,6 +296,7 @@ void WalsheeySampleAudioProcessor::process(juce::AudioBuffer<float>& buffer, juc
     if (voice != nullptr)
     {
         playbackPosition = static_cast<float>(voice->getSourceSamplePosition() / voice->getSampleRate());
+        mCurrentMidiNode = voice->getCurrentlyPlayingNote(); 
     }
 }
 

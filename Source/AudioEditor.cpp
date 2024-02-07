@@ -14,7 +14,7 @@
 
 //==============================================================================
 AudioEditor::AudioEditor(const DataModel& dm, PlaybackPositionOverlay::Providor providor)
-    :mDataModel(dm),  mPlaybackOverlay(mVisibleRange, std::move(providor)), mAudioDisplay(mVisibleRange)
+    :mDataModel(dm),  mPlaybackOverlay(mDataModel, mVisibleRange, std::move(providor)), mAudioDisplay(mVisibleRange)
 {
     mDataModel.addListener(*this);
 
