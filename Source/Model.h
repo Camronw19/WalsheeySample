@@ -29,6 +29,8 @@ namespace IDs
     DECLARE_ID(adsr)
     DECLARE_ID(pitchShift)
     DECLARE_ID(totalRange)
+    DECLARE_ID(hZoom)
+    DECLARE_ID(hScroll)
 
     DECLARE_ID(VISIBLE_RANGE)
     DECLARE_ID(visibleRange)
@@ -262,7 +264,9 @@ public:
         adsr(getState(), IDs::adsr, nullptr),
         isActiveSample(getState(), IDs::isActive, nullptr),
         totalRange(getState(), IDs::totalRange, nullptr), 
-        pitchShift(getState(), IDs::pitchShift, nullptr)
+        pitchShift(getState(), IDs::pitchShift, nullptr),
+        hZoom(getState(), IDs::hZoom, nullptr),
+        hScroll(getState(), IDs::hScroll, nullptr)
     {
         jassert(getState().hasType(IDs::SAMPLE));
         formatManager.registerBasicFormats(); 
@@ -340,6 +344,16 @@ public:
         pitchShift.setValue(constrainedSemitones, nullptr); 
     }
 
+    void setHZoom(double zoom)
+    {
+        hZoom.setValue(zoom, nullptr); 
+    }
+
+    void setHScroll(double scroll)
+    {
+        hScroll.setValue(scroll, nullptr);
+    }
+
     //============ Getter Methods ============
     juce::String getName() const 
     {
@@ -387,6 +401,16 @@ public:
     int getPitchShift()
     {
         return pitchShift; 
+    }
+
+    double getHZoom()
+    {
+        return hZoom; 
+    }
+
+    double getHScroll()
+    {
+        return hScroll; 
     }
 
     //============Listener Methods============
@@ -439,6 +463,14 @@ private:
                 pitchShift.forceUpdateOfCachedValue(); 
                 listenerList.call([&](Listener& l) { l.pitchShiftChanged(pitchShift); });
             }
+            else if (property == IDs::hZoom)
+            {
+                hZoom.forceUpdateOfCachedValue(); 
+            }
+            else if (property == IDs::hScroll)
+            {
+                hScroll.forceUpdateOfCachedValue(); 
+            }
         }
     }
 
@@ -450,6 +482,8 @@ private:
     juce::CachedValue<int> pitchShift; 
     juce::CachedValue<bool> isActiveSample; 
     juce::CachedValue<juce::Range<double>> totalRange;
+    juce::CachedValue<double> hZoom;
+    juce::CachedValue<double> hScroll;
 
     juce::ListenerList<Listener> listenerList;
     juce::AudioFormatManager formatManager; 
@@ -493,6 +527,8 @@ public:
             sampleModel.setId(i);
             sampleModel.setMidiNote(36 + i);
             sampleModel.setTotalRange(juce::Range<double>(0, 0));
+            sampleModel.setHZoom(0); 
+            sampleModel.setHScroll(0); 
 
             sampleModel.getState().addListener(this);
             getState().addChild(sampleModel.getState(), -1, nullptr);

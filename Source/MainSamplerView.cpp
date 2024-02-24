@@ -21,9 +21,9 @@ MainSamplerView::MainSamplerView(const DataModel& dataModel, PlaybackPositionOve
 {
     mDataModel.addListener(*this);
 
-    mTabView.addTab("Editor", AppColors::mainWindowColour, &mAudioEditor, false);
-    mTabView.addTab("ADSR", AppColors::mainWindowColour, &mADSRView, false);
-    mTabView.addTab("Pitch", AppColors::mainWindowColour, &mPitchView, false);
+    mTabView.addTab("Editor", juce::Colours::darkgrey, &mAudioEditor, false);
+    mTabView.addTab("ADSR", juce::Colours::darkgrey, &mADSRView, false);
+    mTabView.addTab("Pitch", juce::Colours::darkgrey, &mPitchView, false);
     mTabView.setCurrentTabIndex(0); 
 
     addAndMakeVisible(mSampleButtons); 
@@ -37,7 +37,7 @@ MainSamplerView::~MainSamplerView()
 
 void MainSamplerView::paint(juce::Graphics& g)
 {
-    g.setColour(AppColors::mainWindowColour);
+    g.setColour(AppColors::Dark::backgroundDefault);
     g.fillAll(); 
 }
 
@@ -47,4 +47,9 @@ void MainSamplerView::resized()
     
     mSampleButtons.setBounds(bounds.removeFromBottom(150)); 
     mTabView.setBounds(bounds); 
+}
+
+void MainSamplerView::lookAndFeelChanged()
+{
+    mTabView.setColour(juce::TabbedComponent::outlineColourId, getLookAndFeel().findColour(AppColors::ColourIds::BackgroundDefault));
 }

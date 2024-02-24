@@ -23,7 +23,7 @@ void PlaybackPositionOverlay::paint(juce::Graphics& g)
 {
     if (mVisibleRange.getTotalRange().getLength() > 0)
     {
-        g.setColour(juce::Colours::red);
+        g.setColour(getLookAndFeel().findColour(AppColors::ColourIds::ActionActive));
         auto playbackInfo = mProvidor(); 
 
         if (mActiveSample->getMidiNote() == playbackInfo.midiNote)
@@ -73,8 +73,14 @@ AudioDisplay::~AudioDisplay()
 
 void AudioDisplay::paint(juce::Graphics& g)
 {
-    auto bounds = getLocalBounds();
-    juce::Rectangle<int> thumbnailBounds(bounds);
+    auto bounds = getLocalBounds().reduced(spacing::padding3); 
+    g.setColour(juce::Colours::black);
+    g.fillRoundedRectangle(bounds.toFloat(), spacing::padding4);
+
+    g.setColour(AppColors::Dark::divider);
+    g.drawRoundedRectangle(bounds.toFloat(), spacing::padding4, 3);
+
+    auto thumbnailBounds = bounds.reduced(3, spacing::padding3);
 
     if (mThumbnail.getNumChannels() == 0)
         paintIfNoFileLoaded(g, thumbnailBounds);
@@ -84,22 +90,16 @@ void AudioDisplay::paint(juce::Graphics& g)
 
 void AudioDisplay::paintIfNoFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(AppColors::componentbackgroundColour);
-    g.fillRect(thumbnailBounds);
-
-    g.setColour(AppColors::accentColour);
+    g.setColour(getLookAndFeel().findColour(AppColors::ColourIds::Accent));
     g.drawFittedText("No File Loaded", thumbnailBounds, juce::Justification::centred, 1);
 }
 
 void AudioDisplay::paintIfFileLoaded(juce::Graphics& g, juce::Rectangle<int>& thumbnailBounds)
 {
-    g.setColour(AppColors::componentbackgroundColour);
-    g.fillRect(thumbnailBounds);
-
     auto startTime = mVisibleRange.getVisibleRange().getStart();
     auto endTime = mVisibleRange.getVisibleRange().getEnd();
 
-    g.setColour(AppColors::accentColour);
+    g.setColour(getLookAndFeel().findColour(AppColors::ColourIds::Accent));
 
     if (mShowChan1 && !mShowChan2)
     {

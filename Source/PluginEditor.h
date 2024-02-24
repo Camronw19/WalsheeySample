@@ -12,6 +12,7 @@
 #include "PluginProcessor.h"
 #include "Model.h"
 #include "MainSamplerView.h"
+#include "UIConfig.h"
 
 
 //==============================================================================
@@ -39,10 +40,11 @@ private:
     virtual void adsrChanged(ADSRParameters) override; 
     virtual void pitchShiftChanged(int) override; 
 
+    DarkLookAndFeel mLF; 
+
     DataModel mDataModel;
     std::unique_ptr<SampleModel> mActiveSample; 
     juce::AudioFormatManager mFormatManager; 
-
     MainSamplerView mMainSamplerView; 
 
     WalsheeySampleAudioProcessor& audioProcessor;

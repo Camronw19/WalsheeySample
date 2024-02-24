@@ -5,6 +5,8 @@
               displaySplashScreen="1">
   <MAINGROUP id="rbvZMw" name="WalsheeySample">
     <GROUP id="{97AC0F2C-2562-36C3-39C9-3456AE2DD379}" name="Source">
+      <FILE id="MPt4K2" name="PitchView.cpp" compile="1" resource="0" file="Source/PitchView.cpp"/>
+      <FILE id="x8LEGx" name="PitchView.h" compile="0" resource="0" file="Source/PitchView.h"/>
       <FILE id="OAhntS" name="ReaderFactory.h" compile="0" resource="0" file="Source/ReaderFactory.h"/>
       <FILE id="h7j7DZ" name="Model.h" compile="0" resource="0" file="Source/Model.h"/>
       <FILE id="l6BUUl" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -35,8 +37,6 @@
       <FILE id="JkvVUL" name="UIConfig.h" compile="0" resource="0" file="Source/UIConfig.h"/>
       <FILE id="d1B1nd" name="ValueTreeObjectList.h" compile="0" resource="0"
             file="Source/ValueTreeObjectList.h"/>
-      <FILE id="Z96jDE" name="ADSRDisplay.cpp" compile="1" resource="0" file="Source/ADSRDisplay.cpp"/>
-      <FILE id="T67uaf" name="ADSRDisplay.h" compile="0" resource="0" file="Source/ADSRDisplay.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>

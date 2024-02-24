@@ -17,6 +17,7 @@
 #include "ADSRView.h"
 #include "UIConfig.h"
 #include "AudioDisplay.h"
+#include "PitchView.h"
 
 class MainSamplerView : public juce::Component, 
                         private DataModel::Listener
@@ -27,6 +28,7 @@ public:
 
     void paint(juce::Graphics&) override;
     void resized() override;
+    void lookAndFeelChanged() override; 
 
 private:
     DataModel mDataModel; 

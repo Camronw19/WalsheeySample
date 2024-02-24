@@ -13,26 +13,28 @@
 WalsheeySampleAudioProcessorEditor::WalsheeySampleAudioProcessorEditor (WalsheeySampleAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p), mMainSamplerView(mDataModel, [&p] { return p.getPlaybackPosition(); })
 {
+    setLookAndFeel(&mLF);
+    mMainSamplerView.setLookAndFeel(&mLF); 
     mFormatManager.registerBasicFormats(); 
 
     mDataModel.addListener(*this); 
     mDataModel.initializeDefaultModel(8);
 
     addAndMakeVisible(mMainSamplerView); 
+    
 
-    //setResizable(true, true); 
-    //setResizeLimits(400, 300, 1200, 900); 
     setSize (800, 500);
 }
 
 WalsheeySampleAudioProcessorEditor::~WalsheeySampleAudioProcessorEditor()
 {
+    setLookAndFeel(nullptr); 
 }
 
 //==============================================================================
 void WalsheeySampleAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll (getLookAndFeel().findColour(AppColors::ColourIds::BackgroundDefault));
 }
 
 void WalsheeySampleAudioProcessorEditor::resized()

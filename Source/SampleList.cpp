@@ -29,16 +29,13 @@ SampleButton::~SampleButton()
 void SampleButton::paint(juce::Graphics& g)
 {
 
-    g.setColour(AppColors::componentbackgroundColour);
+    g.setColour(AppColors::Dark::divider);
     g.fillRoundedRectangle(getLocalBounds().toFloat(), 10);
 
-    g.setColour(juce::Colours::grey);
-    g.drawRoundedRectangle(getLocalBounds().toFloat(), 10, 1);
-
     if (model.isActive())
-        g.setColour(AppColors::accentColour);
+        g.setColour(getLookAndFeel().findColour(AppColors::ColourIds::Accent));
     else
-        g.setColour(juce::Colours::white);
+        g.setColour(getLookAndFeel().findColour(AppColors::ColourIds::ActionActive));
 
     g.setFont(12.0f);
     g.drawText("Button", getLocalBounds().reduced(10), juce::Justification::topLeft, true);
@@ -153,9 +150,7 @@ void SampleList::resized()
 
     int gapSize = std::min(getWidth() / 25, getHeight() / 25);
     grid.setGap(juce::Grid::Px(gapSize));
-    grid.performLayout(getLocalBounds().reduced(10));
-
-
+    grid.performLayout(getLocalBounds().reduced(spacing::padding3));
 }
 
 bool SampleList::isSuitableType(const juce::ValueTree& sample) const

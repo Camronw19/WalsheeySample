@@ -17,9 +17,41 @@
 //==============================================================================
 /*
 */
+class SampleViewControls : public juce::Component,
+                           public juce::Slider::Listener, 
+                           private DataModel::Listener,
+                           private SampleModel::Listener
+{
+public:
+    SampleViewControls(const DataModel&, const VisibleRangeDataModel&);
+    ~SampleViewControls(); 
+
+    void paint(juce::Graphics&) override;
+    void resized() override;
+    void lookAndFeelChanged() override;
+
+private:
+    void ChannelMenuChanged();
+    void updateScrollRange();
+    void updateZoomRange();
+
+    //Component Listener
+    void sliderValueChanged(juce::Slider* slider) override;
+    void activeSampleChanged(SampleModel&) override;
+
+    juce::Slider mVerticalZoom, mHorizontalZoom, mHorizontalScroll;
+    juce::Label mVZoomLabel, mHZoomLabel, mHScroll; 
+    juce::ComboBox mChannelSelect;
+    juce::Label mActiveSampleName;
+
+    DataModel mDataModel;
+    VisibleRangeDataModel mVisibleRange;
+    std::unique_ptr<SampleModel> mActiveSample;
+};
+
+
+
 class AudioEditor : public juce::Component,
-                    public juce::Slider::Listener,
-                    public juce::Button::Listener, 
                     private DataModel::Listener, 
                     private SampleModel::Listener
 {
@@ -31,30 +63,23 @@ public:
     void resized() override;
 
     void setThumbnailSource(const juce::File& inputSource);
+    void lookAndFeelChanged() override;
 
 private:
-    //Component Listener
-    void sliderValueChanged(juce::Slider* slider) override;
-    void buttonClicked(juce::Button* button) override;
+
 
     //Data Model Listener
     void activeSampleChanged(SampleModel&) override; 
 
     //Sample Model Listener
     void fileChanged(std::shared_ptr<juce::File>) override;
-    void nameChanged(juce::String) override;
 
     //Helper Methods
-    void ChannelMenuChanged();
     void updateWaveform(const std::shared_ptr<juce::File>& file);
-    void updateNameLabel(juce::String);
     void updateVisibleRange(const juce::Range<double>&);
-    void updateScrollRange(); 
-    void updateZoomRange(); 
+
     void initializeComponents(); 
 
-    juce::Rectangle<int> getWaveformWindowBounds();
-    juce::Rectangle<int> getSliderWindowBounds();
 
     DataModel mDataModel; 
     VisibleRangeDataModel mVisibleRange; 
@@ -62,11 +87,10 @@ private:
 
     AudioDisplay mAudioDisplay;
     PlaybackPositionOverlay mPlaybackOverlay; 
-    juce::Slider mVerticalZoom;
-    juce::Slider mHorizontalZoom;
-    juce::Slider mHorizontalScroll;
-    juce::ComboBox mChannelSelect;
-    juce::Label mActiveSampleName;
+    SampleViewControls mSampleViewControls; 
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioEditor)
 };
+
+
